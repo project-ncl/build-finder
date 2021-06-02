@@ -44,6 +44,8 @@ public class KojiBuild {
 
     public static final String KEY_MAVEN = "maven";
 
+    private long id = -1L;
+
     private KojiBuildInfo buildInfo;
 
     private KojiTaskInfo taskInfo;
@@ -92,13 +94,16 @@ public class KojiBuild {
         this.remoteRpms = remoteRpms;
     }
 
-    @JsonIgnore
-    public int getId() {
-        if (buildInfo == null) {
-            return -1;
+    public long getId() {
+        if (id == -1L && buildInfo != null) {
+            return (long) buildInfo.getId();
         }
 
-        return buildInfo.getId();
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public KojiBuildInfo getBuildInfo() {
@@ -307,7 +312,7 @@ public class KojiBuild {
     public static class KojiBuildExternalizer implements AdvancedExternalizer<KojiBuild> {
         private static final long serialVersionUID = 8698588352614405297L;
 
-        private static final int VERSION = 2;
+        private static final int VERSION = 3;
 
         private static final Integer ID = (Character.getNumericValue('K') << 16) | (Character.getNumericValue('B') << 8)
                 | Character.getNumericValue('F');
@@ -321,6 +326,7 @@ public class KojiBuild {
             output.writeObject(object.getTags());
             output.writeObject(object.getTypes());
             output.writeObject(object.getRemoteRpms());
+            output.writeLong(object.getId());
         }
 
         @SuppressWarnings("unchecked")
@@ -328,7 +334,7 @@ public class KojiBuild {
         public KojiBuild readObject(ObjectInput input) throws IOException, ClassNotFoundException {
             int version = input.readInt();
 
-            if (version != 1 && version != 2) {
+            if (version < 1 || version > 3) {
                 throw new IOException("Invalid version: " + version);
             }
 
@@ -342,6 +348,10 @@ public class KojiBuild {
 
             if (version > 1) {
                 build.setRemoteRpms((List<KojiRpmInfo>) input.readObject());
+            }
+
+            if (version > 2) {
+                build.setId(input.readLong());
             }
 
             return build;
