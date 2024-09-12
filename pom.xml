@@ -28,7 +28,7 @@
 
   <groupId>org.jboss.pnc.build.finder</groupId>
   <artifactId>parent</artifactId>
-  <version>2.4.3-SNAPSHOT</version>
+  <version>2.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Build Finder Parent</name>
@@ -65,14 +65,14 @@
   <properties>
     <koji.hub.url></koji.hub.url>
     <koji.web.url></koji.web.url>
-    <maven.compiler.release>11</maven.compiler.release>
+    <maven.compiler.release>17</maven.compiler.release>
     <mavenVersion>3.6.3</mavenVersion>
     <pnc.url></pnc.url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipITs>true</skipITs>
     <version.ch.qos.logback>1.5.8</version.ch.qos.logback>
     <version.com.fasterxml.jackson>2.17.2</version.com.fasterxml.jackson>
-    <version.com.ginsberg.junit5-system-exit>1.1.2</version.com.ginsberg.junit5-system-exit>
+    <version.com.ginsberg.junit5-system-exit>2.0.0</version.com.ginsberg.junit5-system-exit>
     <version.com.github.ekryd.sortpom>4.0.0</version.com.github.ekryd.sortpom>
     <version.com.github.luben>1.5.6-5</version.com.github.luben>
     <version.com.github.spotbugs.spotbugs>4.8.6</version.com.github.spotbugs.spotbugs>
@@ -87,8 +87,8 @@
     <version.info.picocli>4.7.6</version.info.picocli>
     <version.io.dropwizard.metrics>4.2.27</version.io.dropwizard.metrics>
     <version.io.smallrye.jandex-maven-plugin>3.2.2</version.io.smallrye.jandex-maven-plugin>
-    <version.net.revelc.code.formatter>2.23.0</version.net.revelc.code.formatter>
-    <version.net.revelc.code.impsort-maven-plugin>1.9.0</version.net.revelc.code.impsort-maven-plugin>
+    <version.net.revelc.code.formatter>2.24.1</version.net.revelc.code.formatter>
+    <version.net.revelc.code.impsort-maven-plugin>1.12.0</version.net.revelc.code.impsort-maven-plugin>
     <version.net.sourceforge.pmd>7.5.0</version.net.sourceforge.pmd>
     <version.org.apache.commons.commons-collections4>4.4</version.org.apache.commons.commons-collections4>
     <version.org.apache.commons.commons-compress>1.27.1</version.org.apache.commons.commons-compress>
@@ -384,23 +384,23 @@
       <dependency>
         <groupId>org.jboss.pnc.build.finder</groupId>
         <artifactId>cli</artifactId>
-        <version>2.4.3-SNAPSHOT</version>
+        <version>2.5.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.pnc.build.finder</groupId>
         <artifactId>core</artifactId>
-        <version>2.4.3-SNAPSHOT</version>
+        <version>2.5.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.pnc.build.finder</groupId>
         <artifactId>core</artifactId>
-        <version>2.4.3-SNAPSHOT</version>
+        <version>2.5.0-SNAPSHOT</version>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.jboss.pnc.build.finder</groupId>
         <artifactId>report</artifactId>
-        <version>2.4.3-SNAPSHOT</version>
+        <version>2.5.0-SNAPSHOT</version>
       </dependency>
       <!-- XXX: Required dependency for kotlin-stdlib-{jdk7,jdk8} (okhttp-4.10.0, 1.5.x and 1.6.x) -->
       <dependency>
