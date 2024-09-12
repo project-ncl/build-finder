@@ -23,22 +23,13 @@
   <ignoreVersions>
     <ignoreVersion type="regex">.+\.CR\d+</ignoreVersion>
     <ignoreVersion type="regex">.+\.Dev\d+</ignoreVersion>
+    <ignoreVersion type="regex">.+-Alpha</ignoreVersion>
     <ignoreVersion type="regex">.+-alpha-?\d+</ignoreVersion>
     <ignoreVersion type="regex">.+-beta-?\d+</ignoreVersion>
     <ignoreVersion type="regex">.+-M\d+</ignoreVersion>
     <ignoreVersion type="regex">.+-rc\d+</ignoreVersion>
   </ignoreVersions>
   <rules>
-    <rule groupId="net.revelc.code" artifactId="impsort-maven-plugin" comparisonMethod="maven">
-      <ignoreVersions>
-        <ignoreVersion type="regex">([2-9]+|1\.[^9].*)</ignoreVersion>
-      </ignoreVersions>
-    </rule>
-    <rule groupId="net.revelc.code.formatter" comparisonMethod="maven">
-      <ignoreVersions>
-        <ignoreVersion type="regex">([^2]\..+|2\.[^2].*|2\.2[^3].*)</ignoreVersion>
-      </ignoreVersions>
-    </rule>
     <rule groupId="org.codehaus.plexus" artifactId="plexus-utils" comparisonMethod="maven">
       <ignoreVersions>
         <ignoreVersion type="regex">[^3]\..+</ignoreVersion>
@@ -66,7 +57,7 @@
     </rule>
     <rule groupId="org.jetbrains.kotlin" comparisonMethod="maven">
       <ignoreVersions>
-        <ignoreVersion type="regex">[^1]\.[^6]\..+</ignoreVersion>
+        <ignoreVersion type="regex">([^1]\..+|1\.[^6].*)</ignoreVersion>
       </ignoreVersions>
     </rule>
   </rules>
