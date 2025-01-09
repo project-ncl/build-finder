@@ -16,6 +16,7 @@
 package org.jboss.pnc.build.finder.core;
 
 import static org.jboss.pnc.build.finder.core.AnsiUtils.green;
+import static org.jboss.pnc.build.finder.core.AnsiUtils.red;
 import static org.jboss.pnc.build.finder.core.BuildFinderUtils.BUILD_ID_ZERO;
 import static org.jboss.pnc.build.finder.core.BuildFinderUtils.isBuildIdZero;
 
@@ -225,8 +226,13 @@ public class PncBuildFinder {
      */
     private Optional<Artifact> findArtifactInPnc(Checksum checksum, Collection<String> fileNames)
             throws RemoteResourceException {
-        if (buildFinderUtils.shouldSkipChecksum(checksum, fileNames)) {
-            LOGGER.debug("Skipped checksum {} for fileNames {}", checksum, fileNames);
+        if (buildFinderUtils.isEmptyFileDigest(checksum)) {
+            LOGGER.warn("Skipped empty file checksum {} for files: {}", red(checksum), red(fileNames));
+            return Optional.empty();
+        }
+
+        if (buildFinderUtils.isEmptyZipDigest(checksum)) {
+            LOGGER.warn("Skipped empty zip checksum {} for files: {}", red(checksum), red(fileNames));
             return Optional.empty();
         }
 
