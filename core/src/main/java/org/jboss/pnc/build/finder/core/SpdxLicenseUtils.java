@@ -418,7 +418,7 @@ public final class SpdxLicenseUtils {
                 validateSPDXListedLicenseId(listedLicense.getId());
             }
         } catch (InvalidLicenseStringException | DefaultStoreNotInitializedException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("Could not parse license string: '" + licenseString + "'", e);
         }
     }
 
