@@ -84,6 +84,10 @@ public final class SpdxLicenseUtils {
 
     private static List<String> LICENSE_NAMES_LIST;
 
+    private static final char SPACE_CHAR = ' ';
+
+    private static final int EXPECTED_EXPRESSION_LENGTH = 64;
+
     static {
         LICENSE_IDS_MAP = new LinkedHashMap<>(EXPECTED_NUM_SPDX_LICENSES);
         List<String> listedLicenseIds = getListedLicenseIds();
@@ -574,6 +578,56 @@ public final class SpdxLicenseUtils {
     static AnyLicenseInfo parseSPDXLicenseString(String licenseString)
             throws InvalidLicenseStringException, DefaultStoreNotInitializedException {
         return LicenseInfoFactory.parseSPDXLicenseString(licenseString);
+    }
+
+    /**
+     * Returns whether the given license string is a license expression.
+     *
+     * @param licenseString the SPDX license identifier or expression
+     * @return true if the license string is a license expression, false otherwise
+     */
+    public static boolean isExpression(String licenseString) {
+        return (licenseString.indexOf(SPACE_CHAR) != -1);
+    }
+
+    /**
+     * Returns whether any of the given SPDX license identifiers contains an indentifier which is actually a license
+     * expression.
+     *
+     * @param spdxLicenseIds the list of SPDX license identifiers
+     * @return true if the list contains a license expression, false otherwise
+     */
+    public static boolean containsExpression(Collection<String> spdxLicenseIds) {
+        return spdxLicenseIds.stream().anyMatch(SpdxLicenseUtils::isExpression);
+
+    }
+
+    /**
+     * Converts a list of SPDX license identifiers to a license expression.
+     *
+     * @param spdxLicenseIds the list of SPDX license identifiers
+     * @return the license expression
+     */
+    public static String toExpression(List<String> spdxLicenseIds) {
+        if (spdxLicenseIds.isEmpty()) {
+            return EMPTY;
+        }
+
+        StringBuilder sb = new StringBuilder(EXPECTED_EXPRESSION_LENGTH);
+
+        for (String spdxLicenseId : spdxLicenseIds) {
+            if (!sb.isEmpty()) {
+                sb.append(" AND ");
+            }
+
+            if (isExpression(spdxLicenseId)) {
+                sb.append('(').append(spdxLicenseId).append(')');
+            } else {
+                sb.append(spdxLicenseId);
+            }
+        }
+
+        return sb.toString();
     }
 
     /**

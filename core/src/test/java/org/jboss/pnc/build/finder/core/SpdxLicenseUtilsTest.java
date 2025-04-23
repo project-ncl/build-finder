@@ -34,6 +34,7 @@ import org.apache.commons.vfs2.VFS;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.spdx.core.DefaultStoreNotInitializedException;
 import org.spdx.core.InvalidSPDXAnalysisException;
@@ -52,6 +53,42 @@ class SpdxLicenseUtilsTest {
     void testParseSPDXLicenseString() throws InvalidLicenseStringException, DefaultStoreNotInitializedException {
         assertThat(SpdxLicenseUtils.parseSPDXLicenseString("(GPL-2.0 WITH Universal-FOSS-exception-1.0)"))
                 .isInstanceOf(WithAdditionOperator.class);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "GPL-2.0 WITH Universal-FOSS-exception-1.0, true",
+            "Apache-2.0, false",
+            "MIT, false",
+            "Apache-2.0 AND MIT AND (GPL-2.0 WITH Universal-FOSS-exception-1.0), true" })
+    void testIsExpression(String licenseString, boolean expected) {
+        assertThat(SpdxLicenseUtils.isExpression(licenseString)).isEqualTo(expected);
+    }
+
+    @Test
+    void testContainsExpression() {
+        assertThat(
+                SpdxLicenseUtils
+                        .containsExpression(List.of("GPL-2.0 WITH Universal-FOSS-exception-1.0")))
+                .isTrue();
+        assertThat(SpdxLicenseUtils.containsExpression(List.of("Apache-2.0"))).isFalse();
+        assertThat(SpdxLicenseUtils.containsExpression(List.of(("MIT")))).isFalse();
+        assertThat(
+                SpdxLicenseUtils.containsExpression(
+                        List.of("Apache-2.0", "MIT", "GPL-2.0 WITH Universal-FOSS-exception-1.0")))
+                .isTrue();
+    }
+
+    @Test
+    void testToExpression() {
+        assertThat(SpdxLicenseUtils.toExpression(List.of("GPL-2.0 WITH Universal-FOSS-exception-1.0")))
+                .isEqualTo("(GPL-2.0 WITH Universal-FOSS-exception-1.0)");
+        assertThat(SpdxLicenseUtils.toExpression(List.of("Apache-2.0"))).isEqualTo("Apache-2.0");
+        assertThat(SpdxLicenseUtils.toExpression(List.of(("MIT")))).isEqualTo("MIT");
+        assertThat(
+                SpdxLicenseUtils.toExpression(
+                        List.of("Apache-2.0", "MIT", "GPL-2.0 WITH Universal-FOSS-exception-1.0")))
+                .isEqualTo("Apache-2.0 AND MIT AND (GPL-2.0 WITH Universal-FOSS-exception-1.0)");
     }
 
     @Test
