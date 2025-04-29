@@ -25,9 +25,9 @@
     <ignoreVersion type="regex">.+\.Dev\d+</ignoreVersion>
     <ignoreVersion type="regex">.+-Alpha</ignoreVersion>
     <ignoreVersion type="regex">.+[-.][Aa]lpha-?\d+</ignoreVersion>
-    <ignoreVersion type="regex">.+[-.][Bb]eta-?\d+</ignoreVersion>
+    <ignoreVersion type="regex">.+[-.][Bb]eta[-.]?\d+</ignoreVersion>
     <ignoreVersion type="regex">.+-M\d+</ignoreVersion>
-    <ignoreVersion type="regex">.+-rc\d+</ignoreVersion>
+    <ignoreVersion type="regex">.+-rc-?\d+</ignoreVersion>
   </ignoreVersions>
   <rules>
     <rule groupId="org.codehaus.plexus" artifactId="plexus-utils" comparisonMethod="maven">
