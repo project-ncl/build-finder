@@ -15,6 +15,10 @@
  */
 package org.jboss.pnc.build.finder.core;
 
+import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.NOASSERTION;
+import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.findFirstSeeAlsoUrl;
+import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.getMatchingLicense;
+
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +38,12 @@ public class LicenseInfo implements Comparable<LicenseInfo> {
 
     private final String sourceUrl;
 
+    /**
+     * Creates a new license from the given Maven POM file.
+     *
+     * @param fileObject the file object pointing to the Maven POM file
+     * @param license the Maven licenses from the POM file
+     */
     public LicenseInfo(FileObject fileObject, License license) {
         comments = license.getComments();
         distribution = license.getDistribution();
@@ -43,12 +53,38 @@ public class LicenseInfo implements Comparable<LicenseInfo> {
         sourceUrl = relativize(fileObject);
     }
 
+    /**
+     * Creates a new license from the given name and URL which come from the JAR {@code META/MANIFEST.MF} OSGI bundle
+     * information.
+     *
+     * @param fileObject the file object point to the JAR {@code META-INF/MANIFEST.MF}
+     * @param name the bundle identifier, or description (the first non-null, if any)
+     * @param url the bundle link, if any
+     */
     public LicenseInfo(FileObject fileObject, String name, String url) {
         comments = null;
         distribution = null;
         this.name = name;
         this.url = url;
         this.spdxLicenseId = SpdxLicenseUtils.getSPDXLicenseId(name, url);
+        sourceUrl = relativize(fileObject);
+    }
+
+    /**
+     * Creates a new license from the given name, which is the relative path to the license text file.
+     * <p>
+     * The license URL will be set to the first valid {@code seeAlso} for the SPDX license identifier, if any.
+     *
+     * @param fileObject the file object pointing to the license text file
+     * @param name the relative file name of the license text file, which may contain the SPDX license identifier
+     */
+    public LicenseInfo(FileObject fileObject, String name) {
+        comments = null;
+        distribution = null;
+        this.name = name;
+        String licenseId = getMatchingLicense(fileObject);
+        this.spdxLicenseId = !NOASSERTION.equals(licenseId) ? licenseId : SpdxLicenseUtils.getSPDXLicenseId(name, null);
+        this.url = findFirstSeeAlsoUrl(spdxLicenseId).orElse(null);
         sourceUrl = relativize(fileObject);
     }
 

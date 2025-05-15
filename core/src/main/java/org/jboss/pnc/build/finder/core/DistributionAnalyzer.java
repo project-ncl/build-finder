@@ -32,8 +32,6 @@ import static org.jboss.pnc.build.finder.core.MavenUtils.getLicenses;
 import static org.jboss.pnc.build.finder.core.MavenUtils.isPom;
 import static org.jboss.pnc.build.finder.core.MavenUtils.isPomXml;
 import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.NOASSERTION;
-import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.getCurrentLicenseId;
-import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.getMatchingLicense;
 import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.getNumberOfSPDXLicenses;
 import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.getSPDXLicenseListVersion;
 import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.getSpdxLicenseMapping;
@@ -710,11 +708,9 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
     }
 
     private static List<LicenseInfo> addLicenseFromTextFile(FileObject jar, FileObject licenseFile) throws IOException {
-        String licenseId = getMatchingLicense(licenseFile);
         LicenseInfo licenseInfo = new LicenseInfo(
                 licenseFile,
-                jar.getName().getRelativeName(licenseFile.getName()),
-                getCurrentLicenseId(licenseId));
+                jar.getName().getRelativeName(licenseFile.getName()));
         return Collections.singletonList(licenseInfo);
     }
 

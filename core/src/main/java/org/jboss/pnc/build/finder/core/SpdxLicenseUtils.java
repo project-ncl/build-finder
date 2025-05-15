@@ -296,7 +296,7 @@ public final class SpdxLicenseUtils {
      * @return the SPDX license short identifier if present, or empty otherwise
      */
     public static Optional<String> findMatchingLicenseId(String licenseId) {
-        if (licenseId == null || licenseId.isBlank()) {
+        if (StringUtils.isBlank(licenseId)) {
             return Optional.empty();
         }
 
@@ -313,6 +313,24 @@ public final class SpdxLicenseUtils {
         return LICENSE_IDS_MAP.size();
     }
 
+    static Optional<String> findFirstSeeAlsoUrl(String licenseId) {
+        if (isUnknownLicenseId(licenseId)) {
+            return Optional.empty();
+        }
+
+        ListedLicense listedLicense = LICENSE_IDS_MAP.get(licenseId);
+
+        if (listedLicense == null) {
+            return Optional.empty();
+        }
+
+        Collection<String> seeAlsos = listedLicense.getSeeAlsos();
+        return seeAlsos
+                .stream()
+                .filter(LicenseUtils::isUrl)
+                .findFirst();
+    }
+
     static Optional<String> findMatchingLicenseSeeAlso(String licenseUrl) {
         if (!LicenseUtils.isUrl(licenseUrl)) {
             return Optional.empty();
@@ -321,13 +339,13 @@ public final class SpdxLicenseUtils {
         Collection<ListedLicense> values = LICENSE_IDS_MAP.values();
 
         for (ListedLicense listedLicense : values) {
-            List<String> seeAlso = listedLicense.getSeeAlsos()
+            List<String> seeAlsos = listedLicense.getSeeAlsos()
                     .stream()
                     .filter(LicenseUtils::isUrl)
                     .map(LicenseUtils::normalizeLicenseUrl)
                     .toList();
 
-            if (seeAlso.contains(LicenseUtils.normalizeLicenseUrl(licenseUrl))) {
+            if (seeAlsos.contains(LicenseUtils.normalizeLicenseUrl(licenseUrl))) {
                 return Optional.of(getCurrentLicenseId(listedLicense.getId()));
             }
         }
