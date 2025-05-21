@@ -210,7 +210,7 @@ file, `config.json`, is as follows.
 The `archive-extensions` option specifies the Koji archive type
 extensions to include in the archive search. If this option is given, it
 will override the `archive-types` option and only files matching the
-extensions will have their checksums taken.
+extensions will have their checksums computed.
 
 The `archive-types` option specifies the Koji archive types to include
 in the archive search.
@@ -257,7 +257,8 @@ The `pnc-partition-size` option sets the Pnc partition size.
 The `pnc-url` option must be set to a valid URL for your particular
 network if you want Pnc support.
 
-The `output-directory` option specifies the directory to use for output.
+The `output-directory` option specifies the directory to use for the output
+files.
 
 The `use-checksums-file` and `use-builds-file` options specify whether
 to load any existing `checksums.json` or `builds.json` file,
@@ -269,10 +270,12 @@ overridden via command-line options.
 ### Command-line options
 
 The `koji-*-url` options are the only required command-line options (if
-not specified in the configuration file) and these options specify the
-URLs for the Koji server. If running Build Finder for the first time,
-you should pass these options so that they are written to the
-configuration file.
+not already specified in the configuration file).
+
+These options specify the URLs for the Koji server.
+
+If running Build Finder for the first time, you should pass these
+options so that they are written to the configuration file.
 
 The `krb-*` options are used for logging in via Kerberos as opposed to
 via SSL as it does not require the additional setup of SSL certificates.
@@ -288,7 +291,7 @@ option is necessary in order for Kerberos login to work.
 ### Execution
 
 After optionally completing setup of the configuration file,
-`config.json`, you can run the software with a command as follows.
+`config.json`, you can run the software with a command
 
     java -jar build-finder-<version>.jar /path/to/distribution.zip
 
@@ -296,8 +299,8 @@ where `<version>` is the current version of the software and
 `/path/to/distribution.zip` is the path to the file that you wish to
 examine. In this execution, Build Finder will read through the file
 `distribution.zip`, trying to match each file entry against a build in
-the Koji database provided that the file name matches one of the
-specified Koji archive types and does not match the exclusion pattern.
+the Koji database as long as the file name matches one of the specified
+Koji archive types and does not match the exclusion pattern.
 
 When a run completes, and Build Finder will create a
 `checksum-<checksum-type>.json` file to cache the file checksums and a
@@ -328,7 +331,7 @@ inside archive files.
 The `builds.json` file contains a map where the key is the Koji build
 ID. The special ID of 0 is used for files with no associated build, as
 Koji builds start at ID 1. The map values contain additional maps. A
-partial list of what is contained is in the value maps is: Koji Build
+partial list of what is contained in the value maps is: Koji Build
 Info, Koji Task Info, Koji Task Request, Koji Archive, a list of all
 remote archives associated with the build and a list of local files from
 the distribution associated with this build.
@@ -338,14 +341,18 @@ the distribution associated with this build.
 The `licenses.json` file contains a map where the key is the local archive file
 name and the value is the license information. The license information consists
 of, at minimum, the SPDX license identifier, the name and/or URL if present,
-and the source of the license information. In addtion, Maven licenses will
-contain the Maven `distribution` value. The `source` can be one of the
-following: `POM` (a standalone `.pom` file), `POM_XML` (a `pom.xml` inside a
-JAR), `BUNDLE_LICENSE` (the `META-INF/MANIFEST.MF` `Bundle-License` value), or
-`TEXT` (a license text file, e.g., `LICENSE` or `<spdxLicenseId>`). The SPDX
-license identifier may use the special values `NONE` (for public domain or "no"
-license), or `NOASSERTION` (some license information was found, but a match was
-not determined).
+and the source URL of the license information. In addtion, Maven licenses will
+contain the Maven `distribution` value.
+
+The `sourceUrl` is the relative URL to the file with the license information.
+There are three types of licenses sources: a Maven POM file (a file named
+`pom.xml` or ending in `.pom`), a `META-INF/MANIFEST.MF` file containing OSGi
+Bundle Headers (specifically, `Bundle-License`), and a license text file (a
+file with the base name `LICENSE` or matching a known SPDX license identifier).
+
+The SPDX license identifier may use the special values `NONE` (for public
+domain or "no" license), or `NOASSERTION` (some license information was found,
+but a match was not determined).
 
 ## Reports
 
@@ -364,7 +371,9 @@ the builds.
 #### Problems flagged
 
 The report currently reports total builds, including the number of
-builds  that are *imports*. Additionally, it reports:
+builds that are *imports*.
+
+Additionally, it reports:
 
 * Matching files with no Koji build associated. These are potentially
   files that need to be rebuilt from source, for example, a dynamic
