@@ -863,9 +863,11 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
         Collection<LicenseInfo> existingLicenses = licensesMap.get(pomOrJarFile);
 
         if (existingLicenses != null) {
-            existingLicenses.addAll(licenseInfos);
+            List<LicenseInfo> newLicenseInfos = new ArrayList<>(existingLicenses);
+            newLicenseInfos.addAll(licenseInfos);
+            licensesMap.put(pomOrJarFile, Collections.unmodifiableCollection(newLicenseInfos));
         } else {
-            licensesMap.put(pomOrJarFile, licenseInfos);
+            licensesMap.put(pomOrJarFile, Collections.unmodifiableCollection(licenseInfos));
         }
     }
 
