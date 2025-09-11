@@ -23,7 +23,7 @@ import org.jboss.pnc.build.finder.protobuf.ArtifactStaticRemoteCollection;
 import org.jboss.pnc.client.RemoteCollection;
 import org.jboss.pnc.client.RemoteResourceException;
 import org.jboss.pnc.dto.Artifact;
-import org.jboss.pnc.dto.BuildPushResult;
+import org.jboss.pnc.dto.BuildPushReport;
 import org.jboss.pnc.dto.ProductVersion;
 
 import com.google.common.collect.Maps;
@@ -45,7 +45,7 @@ public class CachingPncClient implements PncClient {
 
     private final Map<String, ArtifactStaticRemoteCollection> artifactCache;
 
-    private final Map<String, BuildPushResult> getBuildPushResultCache = Maps
+    private final Map<String, BuildPushReport> getBuildPushResultCache = Maps
             .newHashMapWithExpectedSize(GET_BUILD_PUSH_RESULT_CACHE_SIZE);
 
     private final Map<String, ProductVersion> getProductVersionCache = Maps
@@ -126,12 +126,12 @@ public class CachingPncClient implements PncClient {
     }
 
     @Override
-    public BuildPushResult getBuildPushResult(String buildId) throws RemoteResourceException {
-        BuildPushResult cachedEntity = getBuildPushResultCache.get(buildId);
+    public BuildPushReport getBuildPushResult(String buildId) throws RemoteResourceException {
+        BuildPushReport cachedEntity = getBuildPushResultCache.get(buildId);
         if (cachedEntity != null) {
             return cachedEntity;
         } else {
-            BuildPushResult foundEntity = pncClient.getBuildPushResult(buildId);
+            BuildPushReport foundEntity = pncClient.getBuildPushResult(buildId);
             getBuildPushResultCache.put(buildId, foundEntity);
             return foundEntity;
         }

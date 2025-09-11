@@ -18,7 +18,7 @@ package org.jboss.pnc.build.finder.pnc.client;
 import org.jboss.pnc.client.RemoteCollection;
 import org.jboss.pnc.client.RemoteResourceException;
 import org.jboss.pnc.dto.Artifact;
-import org.jboss.pnc.dto.BuildPushResult;
+import org.jboss.pnc.dto.BuildPushReport;
 import org.jboss.pnc.dto.ProductVersion;
 
 /**
@@ -64,7 +64,7 @@ public interface PncClient extends AutoCloseable {
      * @return BuildPushResult entity
      * @throws RemoteResourceException Thrown in case communication with PNC fails
      */
-    BuildPushResult getBuildPushResult(String buildId) throws RemoteResourceException;
+    BuildPushReport getBuildPushResult(String buildId) throws RemoteResourceException;
 
     /**
      * Looks up the ProductVersion that the ProductMilestone is associated with
