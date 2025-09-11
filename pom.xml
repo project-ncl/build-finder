@@ -92,6 +92,7 @@
     <version.commons-validator>1.10.0</version.commons-validator>
     <version.info.picocli>4.7.7</version.info.picocli>
     <version.io.dropwizard.metrics>4.2.36</version.io.dropwizard.metrics>
+    <version.io.opentelemetry.instrumentation>2.17.0</version.io.opentelemetry.instrumentation>
     <version.jakarta.validation>3.1.1</version.jakarta.validation>
     <version.net.revelc.code.formatter>2.26.0</version.net.revelc.code.formatter>
     <version.net.revelc.code.impsort-maven-plugin>1.12.0</version.net.revelc.code.impsort-maven-plugin>
@@ -148,7 +149,7 @@
     <version.org.jboss.byteman>4.0.25</version.org.jboss.byteman>
     <version.org.jboss.logging>3.6.1.Final</version.org.jboss.logging>
     <version.org.jboss.logmanager>3.1.2.Final</version.org.jboss.logmanager>
-    <version.org.jboss.pnc.pnc>3.1.5</version.org.jboss.pnc.pnc>
+    <version.org.jboss.pnc.pnc>3.2.9</version.org.jboss.pnc.pnc>
     <version.org.jboss.pnc.pnc-api>3.2.4</version.org.jboss.pnc.pnc-api>
     <version.org.jeasy>5.0.0</version.org.jeasy>
     <version.org.jetbrains.kotlin>1.6.21</version.org.jetbrains.kotlin>
@@ -262,6 +263,18 @@
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
         <version>${version.info.picocli}</version>
+      </dependency>
+      <!-- Required dependency for org.jboss.pnc:commom -->
+      <dependency>
+        <groupId>io.opentelemetry.instrumentation</groupId>
+        <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+        <version>${version.io.opentelemetry.instrumentation}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>jakarta.validation</groupId>

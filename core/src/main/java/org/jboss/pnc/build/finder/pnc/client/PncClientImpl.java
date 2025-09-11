@@ -26,7 +26,7 @@ import org.jboss.pnc.client.ProductVersionClient;
 import org.jboss.pnc.client.RemoteCollection;
 import org.jboss.pnc.client.RemoteResourceException;
 import org.jboss.pnc.dto.Artifact;
-import org.jboss.pnc.dto.BuildPushResult;
+import org.jboss.pnc.dto.BuildPushReport;
 import org.jboss.pnc.dto.ProductMilestone;
 import org.jboss.pnc.dto.ProductVersion;
 
@@ -77,7 +77,7 @@ public class PncClientImpl implements PncClient {
     }
 
     @Override
-    public BuildPushResult getBuildPushResult(String buildId) throws RemoteResourceException {
+    public BuildPushReport getBuildPushResult(String buildId) throws RemoteResourceException {
         return buildClient.getPushResult(buildId);
     }
 

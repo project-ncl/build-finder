@@ -290,7 +290,7 @@ public final class PncUtils {
         BuildType buildType = pncBuild.getBuild().getBuildConfigRevision().getBuildType();
 
         return switch (buildType) {
-            case MVN, GRADLE, SBT -> maven;
+            case GRADLE, MVN, MVN_RPM, SBT -> maven;
             case NPM -> npm;
         };
     }

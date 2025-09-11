@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jboss.pnc.dto.Build;
-import org.jboss.pnc.dto.BuildPushResult;
+import org.jboss.pnc.dto.BuildPushReport;
 import org.jboss.pnc.dto.ProductVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,7 +30,7 @@ public class PncBuild {
 
     private Build build;
 
-    private BuildPushResult buildPushResult;
+    private BuildPushReport buildPushResult;
 
     private ProductVersion productVersion;
 
@@ -47,7 +47,7 @@ public class PncBuild {
 
     public PncBuild(
             Build build,
-            BuildPushResult buildPushResult,
+            BuildPushReport buildPushResult,
             ProductVersion productVersion,
             List<EnhancedArtifact> builtArtifacts) {
         this.build = build;
@@ -83,11 +83,11 @@ public class PncBuild {
         this.build = build;
     }
 
-    public Optional<BuildPushResult> getBuildPushResult() {
+    public Optional<BuildPushReport> getBuildPushResult() {
         return Optional.ofNullable(buildPushResult);
     }
 
-    public void setBuildPushResult(BuildPushResult buildPushResult) {
+    public void setBuildPushResult(BuildPushReport buildPushResult) {
         this.buildPushResult = buildPushResult;
     }
 

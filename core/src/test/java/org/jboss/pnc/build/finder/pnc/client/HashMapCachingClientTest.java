@@ -23,7 +23,7 @@ import java.util.Collections;
 import org.jboss.pnc.client.RemoteCollection;
 import org.jboss.pnc.client.RemoteResourceException;
 import org.jboss.pnc.dto.Artifact;
-import org.jboss.pnc.dto.BuildPushResult;
+import org.jboss.pnc.dto.BuildPushReport;
 import org.jboss.pnc.dto.ProductVersion;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -80,7 +80,7 @@ class HashMapCachingClientTest {
         }
 
         @Override
-        public BuildPushResult getBuildPushResult(String buildId) {
+        public BuildPushReport getBuildPushResult(String buildId) {
             return null;
         }
 
