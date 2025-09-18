@@ -131,7 +131,7 @@ public class PncBuildFinder {
                 }
 
                 try {
-                    pncBuild.setBuildPushResult(pncClient.getBuildPushResult(build.getId()));
+                    pncBuild.setBuildPushReport(pncClient.getBuildPushReport(build.getId()));
                 } catch (RemoteResourceNotFoundException e) {
                     // NOOP - keep the field empty
                 } catch (RemoteResourceException e) {

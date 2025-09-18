@@ -227,9 +227,9 @@ public final class PncUtils {
         extra.put(EXTERNAL_PROJECT_ID, build.getProject().getId());
         extra.put(EXTERNAL_BUILD_CONFIGURATION_ID, build.getBuildConfigRevision().getId());
 
-        pncBuild.getBuildPushResult().ifPresent(buildPushResult -> {
-            extra.put(EXTERNAL_BREW_BUILD_ID, buildPushResult.getBrewBuildId());
-            extra.put(EXTERNAL_BREW_BUILD_URL, buildPushResult.getBrewBuildUrl());
+        pncBuild.getBuildPushReport().ifPresent(buildPushReport -> {
+            extra.put(EXTERNAL_BREW_BUILD_ID, buildPushReport.getBrewBuildId());
+            extra.put(EXTERNAL_BREW_BUILD_URL, buildPushReport.getBrewBuildUrl());
         });
 
         pncBuild.getProductVersion().ifPresent(productVersion -> {

@@ -77,7 +77,8 @@ public class PncClientImpl implements PncClient {
     }
 
     @Override
-    public BuildPushReport getBuildPushResult(String buildId) throws RemoteResourceException {
+    public BuildPushReport getBuildPushReport(String buildId) throws RemoteResourceException {
+        // XXX: method still has old name internally
         return buildClient.getPushResult(buildId);
     }
 

@@ -91,13 +91,13 @@ class PncClientImplIT extends AbstractKojiIT {
     }
 
     @Test
-    void testNotGetBuildPushResult() {
+    void testNotGetBuildPushReport() {
         assertThatThrownBy(() -> {
             // given
             String buildId = "0000000000000";
 
             // when
-            getPncClient().getBuildPushResult(buildId);
+            getPncClient().getBuildPushReport(buildId);
         }).isExactlyInstanceOf(RemoteResourceNotFoundException.class)
                 .hasMessage("javax.ws.rs.NotFoundException: HTTP 404 Not Found");
     }

@@ -115,7 +115,7 @@ class PncBuildFinderTest {
                 .build();
 
         when(pncClient.getArtifactsByMd5(md5)).thenReturn(createArtifactsRemoteCollection(artifact));
-        when(pncClient.getBuildPushResult(buildId))
+        when(pncClient.getBuildPushReport(buildId))
                 .thenThrow(new RemoteResourceNotFoundException(new ClientErrorException(Response.Status.NOT_FOUND)));
 
         BuildFinderUtils buildFinderUtils = new BuildFinderUtils(buildConfig, null, kojiClientSession);
