@@ -58,13 +58,13 @@ public interface PncClient extends AutoCloseable {
     RemoteCollection<Artifact> getArtifactsBySha256(String sha256) throws RemoteResourceException;
 
     /**
-     * Gets BuildPushResult with a build specified as a parameter
+     * Gets {@link BuildPushReport} with a build specified as a parameter
      *
      * @param buildId Build ID
-     * @return BuildPushResult entity
+     * @return {@link BuildPushReport} entity
      * @throws RemoteResourceException Thrown in case communication with PNC fails
      */
-    BuildPushReport getBuildPushResult(String buildId) throws RemoteResourceException;
+    BuildPushReport getBuildPushReport(String buildId) throws RemoteResourceException;
 
     /**
      * Looks up the ProductVersion that the ProductMilestone is associated with

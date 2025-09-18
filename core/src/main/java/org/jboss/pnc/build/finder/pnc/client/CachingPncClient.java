@@ -45,7 +45,7 @@ public class CachingPncClient implements PncClient {
 
     private final Map<String, ArtifactStaticRemoteCollection> artifactCache;
 
-    private final Map<String, BuildPushReport> getBuildPushResultCache = Maps
+    private final Map<String, BuildPushReport> getBuildPushReportCache = Maps
             .newHashMapWithExpectedSize(GET_BUILD_PUSH_RESULT_CACHE_SIZE);
 
     private final Map<String, ProductVersion> getProductVersionCache = Maps
@@ -126,13 +126,13 @@ public class CachingPncClient implements PncClient {
     }
 
     @Override
-    public BuildPushReport getBuildPushResult(String buildId) throws RemoteResourceException {
-        BuildPushReport cachedEntity = getBuildPushResultCache.get(buildId);
+    public BuildPushReport getBuildPushReport(String buildId) throws RemoteResourceException {
+        BuildPushReport cachedEntity = getBuildPushReportCache.get(buildId);
         if (cachedEntity != null) {
             return cachedEntity;
         } else {
-            BuildPushReport foundEntity = pncClient.getBuildPushResult(buildId);
-            getBuildPushResultCache.put(buildId, foundEntity);
+            BuildPushReport foundEntity = pncClient.getBuildPushReport(buildId);
+            getBuildPushReportCache.put(buildId, foundEntity);
             return foundEntity;
         }
     }

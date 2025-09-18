@@ -30,7 +30,7 @@ public class PncBuild {
 
     private Build build;
 
-    private BuildPushReport buildPushResult;
+    private BuildPushReport buildPushReport;
 
     private ProductVersion productVersion;
 
@@ -47,11 +47,11 @@ public class PncBuild {
 
     public PncBuild(
             Build build,
-            BuildPushReport buildPushResult,
+            BuildPushReport buildPushReport,
             ProductVersion productVersion,
             List<EnhancedArtifact> builtArtifacts) {
         this.build = build;
-        this.buildPushResult = buildPushResult;
+        this.buildPushReport = buildPushReport;
         this.productVersion = productVersion;
         this.builtArtifacts = builtArtifacts;
     }
@@ -83,12 +83,12 @@ public class PncBuild {
         this.build = build;
     }
 
-    public Optional<BuildPushReport> getBuildPushResult() {
-        return Optional.ofNullable(buildPushResult);
+    public Optional<BuildPushReport> getBuildPushReport() {
+        return Optional.ofNullable(buildPushReport);
     }
 
-    public void setBuildPushResult(BuildPushReport buildPushResult) {
-        this.buildPushResult = buildPushResult;
+    public void setBuildPushReport(BuildPushReport buildPushReport) {
+        this.buildPushReport = buildPushReport;
     }
 
     public Optional<ProductVersion> getProductVersion() {
@@ -109,7 +109,7 @@ public class PncBuild {
 
     @Override
     public String toString() {
-        return "PncBuild{" + "build=" + build + ", buildPushResult=" + buildPushResult + ", productVersion="
+        return "PncBuild{" + "build=" + build + ", buildPushReport=" + buildPushReport + ", productVersion="
                 + productVersion + ", builtArtifacts=" + builtArtifacts + '}';
     }
 }

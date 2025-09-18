@@ -80,7 +80,7 @@ class HashMapCachingClientTest {
         }
 
         @Override
-        public BuildPushReport getBuildPushResult(String buildId) {
+        public BuildPushReport getBuildPushReport(String buildId) {
             return null;
         }
 
