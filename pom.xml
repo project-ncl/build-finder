@@ -1331,6 +1331,7 @@ junit.jupiter.execution.parallel.config.dynamic.factor=1</configurationParameter
           <tagNameFormat>@{project.version}</tagNameFormat>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <releaseProfiles>empty-javadoc-jar,gpg-sign</releaseProfiles>
+          <signTag>false</signTag>
         </configuration>
       </plugin>
       <plugin>
