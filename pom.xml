@@ -87,7 +87,7 @@
     <version.com.mycila>5.0.0</version.com.mycila>
     <version.com.puppycrawl.tools>12.1.1</version.com.puppycrawl.tools>
     <version.com.redhat.red.build.kojiji>2.25</version.com.redhat.red.build.kojiji>
-    <version.commons-codec>1.19.0</version.commons-codec>
+    <version.commons-codec>1.20.0</version.commons-codec>
     <version.commons-io>2.20.0</version.commons-io>
     <version.commons-validator>1.10.0</version.commons-validator>
     <version.info.picocli>4.7.7</version.info.picocli>
