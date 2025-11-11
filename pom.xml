@@ -93,6 +93,7 @@
     <version.info.picocli>4.7.7</version.info.picocli>
     <version.io.dropwizard.metrics>4.2.37</version.io.dropwizard.metrics>
     <version.io.opentelemetry.instrumentation>2.21.0</version.io.opentelemetry.instrumentation>
+    <version.io.smallrye.common>2.14.0</version.io.smallrye.common>
     <version.jakarta.validation>3.1.1</version.jakarta.validation>
     <version.net.revelc.code.formatter>2.26.0</version.net.revelc.code.formatter>
     <version.net.revelc.code.impsort-maven-plugin>1.12.0</version.net.revelc.code.impsort-maven-plugin>
@@ -173,6 +174,13 @@
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${version.com.fasterxml.jackson}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.smallrye.common</groupId>
+        <artifactId>smallrye-common-bom</artifactId>
+        <version>${version.io.smallrye.common}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -264,7 +272,7 @@
         <artifactId>picocli</artifactId>
         <version>${version.info.picocli}</version>
       </dependency>
-      <!-- Required dependency for org.jboss.pnc:commom -->
+      <!-- Required dependency for org.jboss.pnc:common -->
       <dependency>
         <groupId>io.opentelemetry.instrumentation</groupId>
         <artifactId>opentelemetry-instrumentation-annotations</artifactId>
