@@ -74,7 +74,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipITs>true</skipITs>
     <version.central-publishing-maven-plugin>0.9.0</version.central-publishing-maven-plugin>
-    <version.ch.qos.logback>1.5.20</version.ch.qos.logback>
+    <version.ch.qos.logback>1.5.21</version.ch.qos.logback>
     <version.com.fasterxml.jackson>2.20.1</version.com.fasterxml.jackson>
     <version.com.ginsberg.junit5-system-exit>2.0.2</version.com.ginsberg.junit5-system-exit>
     <version.com.github.ekryd.sortpom>4.0.0</version.com.github.ekryd.sortpom>
@@ -93,8 +93,9 @@
     <version.info.picocli>4.7.7</version.info.picocli>
     <version.io.dropwizard.metrics>4.2.37</version.io.dropwizard.metrics>
     <version.io.opentelemetry.instrumentation>2.21.0</version.io.opentelemetry.instrumentation>
+    <version.io.smallrye.common>2.14.0</version.io.smallrye.common>
     <version.jakarta.validation>3.1.1</version.jakarta.validation>
-    <version.net.revelc.code.formatter>2.26.0</version.net.revelc.code.formatter>
+    <version.net.revelc.code.formatter>2.29.0</version.net.revelc.code.formatter>
     <version.net.revelc.code.impsort-maven-plugin>1.12.0</version.net.revelc.code.impsort-maven-plugin>
     <version.net.sourceforge.pmd>7.18.0</version.net.sourceforge.pmd>
     <version.org.apache.commons.commons-collections4>4.5.0</version.org.apache.commons.commons-collections4>
@@ -144,7 +145,8 @@
     <version.org.eclipse.packager>0.21.0</version.org.eclipse.packager>
     <version.org.fusesource.jansi>2.4.2</version.org.fusesource.jansi>
     <version.org.hibernate.validator>9.1.0.Final</version.org.hibernate.validator>
-    <version.org.infinispan>15.2.6.Final</version.org.infinispan>
+    <version.org.infinispan>16.0.1</version.org.infinispan>
+    <version.org.infinispan.protostream>6.0.1</version.org.infinispan.protostream>
     <version.org.jacoco>0.8.14</version.org.jacoco>
     <version.org.jboss.byteman>4.0.26</version.org.jboss.byteman>
     <version.org.jboss.logging>3.6.1.Final</version.org.jboss.logging>
@@ -173,6 +175,13 @@
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${version.com.fasterxml.jackson}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.smallrye.common</groupId>
+        <artifactId>smallrye-common-bom</artifactId>
+        <version>${version.io.smallrye.common}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -264,7 +273,7 @@
         <artifactId>picocli</artifactId>
         <version>${version.info.picocli}</version>
       </dependency>
-      <!-- Required dependency for org.jboss.pnc:commom -->
+      <!-- Required dependency for org.jboss.pnc:common -->
       <dependency>
         <groupId>io.opentelemetry.instrumentation</groupId>
         <artifactId>opentelemetry-instrumentation-annotations</artifactId>
@@ -918,6 +927,13 @@
           <version>${version.org.apache.maven.plugins.maven-compiler-plugin}</version>
           <configuration>
             <proc>full</proc>
+            <annotationProcessorPaths>
+              <annotationProcessorPath>
+                <groupId>org.infinispan.protostream</groupId>
+                <artifactId>protostream-processor</artifactId>
+                <version>${version.org.infinispan.protostream}</version>
+              </annotationProcessorPath>
+            </annotationProcessorPaths>
           </configuration>
         </plugin>
         <plugin>
