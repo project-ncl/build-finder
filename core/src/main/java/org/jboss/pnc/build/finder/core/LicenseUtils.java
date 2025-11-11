@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 
@@ -90,10 +91,10 @@ public final class LicenseUtils {
         path = path.replace("cc-0", "cc0");
 
         for (String extension : TEXT_EXTENSIONS) {
-            path = StringUtils.removeEnd(path, extension);
+            path = Strings.CS.removeEnd(path, extension);
         }
 
-        path = StringUtils.removeEnd(path, "/");
+        path = Strings.CS.removeEnd(path, "/");
 
         return host + path;
     }
@@ -106,8 +107,8 @@ public final class LicenseUtils {
      */
     public static boolean isUrl(String... strings) {
         for (String s : strings) {
-            if (!StringUtils.contains(s, URL_MARKER) || StringUtils.containsWhitespace(s)
-                    || StringUtils.contains(s, UNINTERPOLATED_PROPERTY_MARKER)) {
+            if (!Strings.CS.contains(s, URL_MARKER) || StringUtils.containsWhitespace(s)
+                    || Strings.CS.contains(s, UNINTERPOLATED_PROPERTY_MARKER)) {
                 return false;
             }
         }
@@ -177,7 +178,7 @@ public final class LicenseUtils {
             return true;
         }
 
-        String ext = StringUtils.prependIfMissing(extension, DOT);
+        String ext = Strings.CS.prependIfMissing(extension, DOT);
         return TEXT_EXTENSIONS.contains(ext);
     }
 

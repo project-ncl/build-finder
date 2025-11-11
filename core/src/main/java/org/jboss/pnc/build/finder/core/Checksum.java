@@ -37,7 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
@@ -310,13 +310,13 @@ public class Checksum implements Comparable<Checksum>, Serializable {
             return i;
         }
 
-        int j = StringUtils.compare(value, o.value);
+        int j = Strings.CS.compare(value, o.value);
 
         if (j != 0) {
             return j;
         }
 
-        int k = StringUtils.compare(filename, o.filename);
+        int k = Strings.CS.compare(filename, o.filename);
 
         if (k != 0) {
             return k;

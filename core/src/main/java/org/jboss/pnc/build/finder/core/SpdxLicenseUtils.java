@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -223,7 +224,7 @@ public final class SpdxLicenseUtils {
      */
     public static Optional<String> findMatchingLicenseName(String licenseName, String licenseUrl) {
         for (String licenseId : LICENSE_IDS_LIST) {
-            if (LicenseUtils.containsWordsInSameOrder(licenseName, StringUtils.replace(licenseId, "-only", ""))
+            if (LicenseUtils.containsWordsInSameOrder(licenseName, Strings.CS.replace(licenseId, "-only", ""))
                     || LicenseUtils.containsWordsInSameOrder(licenseUrl, licenseId)) {
                 return Optional.of(getCurrentLicenseId(licenseId));
             }
@@ -232,7 +233,7 @@ public final class SpdxLicenseUtils {
         for (String spdxLicenseName : LICENSE_NAMES_LIST) {
             if (spdxLicenseName.equalsIgnoreCase(licenseName)
                     || LicenseUtils
-                            .containsWordsInSameOrder(licenseName, StringUtils.replace(spdxLicenseName, " only", ""))
+                            .containsWordsInSameOrder(licenseName, Strings.CS.replace(spdxLicenseName, " only", ""))
                     || LicenseUtils.containsWordsInSameOrder(licenseUrl, spdxLicenseName)) {
                 ListedLicense listedLicense = LICENSE_NAMES_MAP.get(spdxLicenseName);
                 String licenseId = getCurrentLicenseId(listedLicense.getId());
@@ -517,7 +518,7 @@ public final class SpdxLicenseUtils {
         String name = FilenameUtils.getName(fileName);
         String baseName = FilenameUtils.removeExtension(name);
 
-        return StringUtils.containsIgnoreCase(baseName, LICENSE) || isKnownLicenseId(baseName);
+        return Strings.CI.contains(baseName, LICENSE) || isKnownLicenseId(baseName);
     }
 
     /**
@@ -570,7 +571,7 @@ public final class SpdxLicenseUtils {
                     String normalizedString = StringUtils.normalizeSpace(licenseString);
                     String normalizedNameOrUrl = StringUtils.normalizeSpace(licenseNameOrUrl);
 
-                    if (StringUtils.equalsIgnoreCase(normalizedNameOrUrl, normalizedString)) {
+                    if (Strings.CI.equals(normalizedNameOrUrl, normalizedString)) {
                         return Optional.of(getCurrentLicenseId(licenseId));
                     }
                 }

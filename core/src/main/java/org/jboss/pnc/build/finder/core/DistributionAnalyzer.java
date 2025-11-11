@@ -80,7 +80,7 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileExtensionSelector;
 import org.apache.commons.vfs2.FileObject;
@@ -544,12 +544,11 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
 
             for (ChecksumType checksumType : checksumTypesToCheck) {
                 Optional<Checksum> optionalChecksum = Checksum.findByType(checksums, checksumType);
-
-                if (optionalChecksum.isPresent()) {
-                    Checksum checksum = optionalChecksum.get();
-                    map.get(checksumType)
-                            .put(checksum.getValue(), new LocalFile(checksum.getFilename(), checksum.getFileSize()));
-                }
+                optionalChecksum.ifPresent(
+                        checksum -> map.get(checksumType)
+                                .put(
+                                        checksum.getValue(),
+                                        new LocalFile(checksum.getFilename(), checksum.getFileSize())));
             }
 
             for (Checksum checksum : checksums) {
@@ -663,7 +662,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
 
     private static boolean isMainJar(FileObject fo) {
         String name = fo.getPublicURIString();
-        return name.endsWith(JAR_URI) && !StringUtils.endsWithAny(name, JARS_TO_IGNORE);
+        return name.endsWith(JAR_URI) && !Strings.CS.endsWithAny(name, JARS_TO_IGNORE);
     }
 
     private List<LicenseInfo> addLicensesFromJar(FileObject jar, List<FileObject> localFiles) {

@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.infinispan.commons.api.BasicCache;
 import org.infinispan.commons.api.BasicCacheContainer;
 import org.jboss.pnc.build.finder.koji.ClientSession;
@@ -1472,7 +1472,7 @@ public class BuildFinder
         Set<LicenseInfo> allLicenses = new TreeSet<>();
 
         for (Entry<String, Collection<LicenseInfo>> licenseEntry : entries) {
-            String filename = StringUtils.removeEnd(licenseEntry.getKey(), BANG_SLASH);
+            String filename = Strings.CS.removeEnd(licenseEntry.getKey(), BANG_SLASH);
             Optional<KojiLocalArchive> optLocalArchive = findLocalArchiveForFilename(filename, allBuilds);
 
             if (optLocalArchive.isPresent()) {
