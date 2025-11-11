@@ -21,7 +21,7 @@ import static org.jboss.pnc.build.finder.core.SpdxLicenseUtils.getMatchingLicens
 
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.maven.model.License;
 
@@ -133,31 +133,31 @@ public class LicenseInfo implements Comparable<LicenseInfo> {
             return 1;
         }
 
-        int compare = StringUtils.compare(spdxLicenseId, o.spdxLicenseId);
+        int compare = Strings.CS.compare(spdxLicenseId, o.spdxLicenseId);
 
         if (compare != 0) {
             return compare;
         }
 
-        compare = StringUtils.compare(name, o.name);
+        compare = Strings.CS.compare(name, o.name);
 
         if (compare != 0) {
             return compare;
         }
 
-        compare = StringUtils.compare(sourceUrl, o.sourceUrl);
+        compare = Strings.CS.compare(sourceUrl, o.sourceUrl);
 
         if (compare != 0) {
             return compare;
         }
 
-        compare = StringUtils.compare(distribution, o.distribution);
+        compare = Strings.CS.compare(distribution, o.distribution);
 
         if (compare != 0) {
             return compare;
         }
 
-        return StringUtils.compare(comments, o.comments);
+        return Strings.CS.compare(comments, o.comments);
     }
 
     @Override

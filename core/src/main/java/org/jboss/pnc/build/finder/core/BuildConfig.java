@@ -16,7 +16,9 @@
 package org.jboss.pnc.build.finder.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +104,11 @@ public class BuildConfig {
     }
 
     public static BuildConfig load(URL url) throws IOException {
-        return MAPPER.readValue(url, BuildConfig.class);
+        URLConnection connection = url.openConnection();
+
+        try (InputStream in = connection.getInputStream()) {
+            return MAPPER.readValue(in, BuildConfig.class);
+        }
     }
 
     public static BuildConfig load(ClassLoader cl) throws IOException {
@@ -128,7 +134,11 @@ public class BuildConfig {
 
     public static BuildConfig merge(BuildConfig config, URL url) throws IOException {
         ObjectReader reader = MAPPER.readerForUpdating(config);
-        return reader.readValue(url);
+        URLConnection connection = url.openConnection();
+
+        try (InputStream in = connection.getInputStream()) {
+            return reader.readValue(in);
+        }
     }
 
     public static BuildConfig copy(BuildConfig baseConfig) {
