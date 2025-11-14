@@ -166,7 +166,7 @@
     <version.org.slf4j>2.0.17</version.org.slf4j>
     <version.org.spdx.java-spdx-library>2.0.1</version.org.spdx.java-spdx-library>
     <version.org.spdx.spdx-java-core>1.0.1</version.org.spdx.spdx-java-core>
-    <version.org.wiremock>3.13.1</version.org.wiremock>
+    <version.org.wiremock>3.13.2</version.org.wiremock>
   </properties>
 
   <dependencyManagement>
