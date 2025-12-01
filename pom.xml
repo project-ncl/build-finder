@@ -145,7 +145,7 @@
     <version.org.eclipse.packager>0.21.0</version.org.eclipse.packager>
     <version.org.fusesource.jansi>2.4.2</version.org.fusesource.jansi>
     <version.org.hibernate.validator>9.1.0.Final</version.org.hibernate.validator>
-    <version.org.infinispan>16.0.2</version.org.infinispan>
+    <version.org.infinispan>16.0.3</version.org.infinispan>
     <version.org.infinispan.protostream>6.0.1</version.org.infinispan.protostream>
     <version.org.jacoco>0.8.14</version.org.jacoco>
     <version.org.jboss.byteman>4.0.26</version.org.jboss.byteman>
