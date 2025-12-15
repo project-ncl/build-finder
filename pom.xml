@@ -92,7 +92,7 @@
     <version.commons-validator>1.10.1</version.commons-validator>
     <version.info.picocli>4.7.7</version.info.picocli>
     <version.io.dropwizard.metrics>4.2.37</version.io.dropwizard.metrics>
-    <version.io.opentelemetry.instrumentation>2.22.0</version.io.opentelemetry.instrumentation>
+    <version.io.opentelemetry.instrumentation>2.23.0</version.io.opentelemetry.instrumentation>
     <version.io.smallrye.common>2.14.0</version.io.smallrye.common>
     <version.jakarta.validation>3.1.1</version.jakarta.validation>
     <version.net.revelc.code.formatter>2.29.0</version.net.revelc.code.formatter>
