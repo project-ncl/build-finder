@@ -186,7 +186,7 @@ public class BuildFinder
         this.foundChecksums = Maps.newHashMapWithExpectedSize(FOUND_CHECKSUMS_SIZE);
         this.notFoundChecksums = Maps.newHashMapWithExpectedSize(NOT_FOUND_CHECKSUMS_SIZE);
 
-        this.pncLookupOnly = true;
+        this.pncLookupOnly = false;
 
         initBuilds();
     }
@@ -549,7 +549,7 @@ public class BuildFinder
      * @param filename the filename
      * @return the parent of the file name (separated by &quot;!/&quot;)
      */
-    private Optional<String> handleNotFoundFile(String filename) {
+    private Optional<String> handleNotFoundFile(String filename, Map<BuildSystemInteger, KojiBuild> builds) {
         LOGGER.debug("Handle not found file: {}", filename);
 
         int index = filename.lastIndexOf(BANG_SLASH);
@@ -588,7 +588,7 @@ public class BuildFinder
             return Optional.empty();
         }
 
-        return handleNotFoundFile(parentFilename);
+        return handleNotFoundFile(parentFilename, builds);
     }
 
     /**
@@ -1133,7 +1133,7 @@ public class BuildFinder
 
             while (it2.hasNext()) {
                 String filename = it2.next();
-                Optional<String> optionalParentFilename = handleNotFoundFile(filename);
+                Optional<String> optionalParentFilename = handleNotFoundFile(filename, this.builds);
 
                 if (optionalParentFilename.isPresent() && optionalParentFilename.get().contains(BANG_SLASH)) {
                     LOGGER.debug("Removing {} since we found a parent elsewhere", filename);
@@ -1409,6 +1409,10 @@ public class BuildFinder
             checksums.clear();
         }
 
+        if (this.pncLookupOnly) {
+            cleanUpBuildZero(allBuilds);
+        }
+
         int size = allBuilds.size();
         int numBuilds = size >= 1 ? size - 1 : 0;
 
@@ -1483,6 +1487,30 @@ public class BuildFinder
         return allBuilds;
     }
 
+    private void cleanUpBuildZero(Map<BuildSystemInteger, KojiBuild> allBuilds) {
+        final KojiBuild buildZero = allBuilds.get(new BuildSystemInteger(0, BuildSystem.none));
+
+        final List<KojiLocalArchive> localArchives = buildZero.getArchives();
+        final Iterator<KojiLocalArchive> archiveIterator = localArchives.iterator();
+        while (archiveIterator.hasNext()) {
+            final KojiLocalArchive kojiLocalArchive = archiveIterator.next();
+            final Collection<String> filenames = kojiLocalArchive.getFilenames();
+
+            final Iterator<String> filenamesIterator = filenames.iterator();
+            while (filenamesIterator.hasNext()) {
+                final String filename = filenamesIterator.next();
+                final Optional<String> optionalParentFilename = handleNotFoundFile(filename, allBuilds);
+                if (optionalParentFilename.isPresent() && optionalParentFilename.get().contains(BANG_SLASH)) {
+                    filenamesIterator.remove();
+                }
+            }
+
+            if (filenames.isEmpty()) {
+                archiveIterator.remove();
+            }
+        }
+    }
+
     private static Set<LicenseInfo> addLicensesToBuilds(
             Map<String, Collection<LicenseInfo>> licensesMap,
             Map<BuildSystemInteger, KojiBuild> allBuilds) {
@@ -1548,7 +1576,7 @@ public class BuildFinder
         }
     }
 
-    public void allowKojiLookup() {
-        this.pncLookupOnly = false;
+    public void allowPncLookupsOnly() {
+        this.pncLookupOnly = true;
     }
 }
