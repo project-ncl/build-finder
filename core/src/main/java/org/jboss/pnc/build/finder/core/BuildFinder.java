@@ -135,6 +135,8 @@ public class BuildFinder
 
     private BuildFinderListener listener;
 
+    private boolean pncLookupOnly;
+
     public BuildFinder(ClientSession session, BuildConfig config) {
         this(session, config, null, null, null);
     }
@@ -183,6 +185,8 @@ public class BuildFinder
 
         this.foundChecksums = Maps.newHashMapWithExpectedSize(FOUND_CHECKSUMS_SIZE);
         this.notFoundChecksums = Maps.newHashMapWithExpectedSize(NOT_FOUND_CHECKSUMS_SIZE);
+
+        this.pncLookupOnly = true;
 
         initBuilds();
     }
@@ -1315,6 +1319,13 @@ public class BuildFinder
 
                 allBuilds.putAll(pncBuildsNew.getFoundBuilds());
 
+                if (this.pncLookupOnly) {
+                    // Skip Koji Lookup
+                    localchecksumMap.clear();
+                    checksums.clear();
+                    continue;
+                }
+
                 if (!pncBuildsNew.getNotFoundChecksums().isEmpty()) {
                     LOGGER.debug(
                             "Need to search in Brew!! Not found checksums: {}",
@@ -1362,6 +1373,13 @@ public class BuildFinder
                     allBuilds.putAll(kojiBuildsNew);
                 }
             } else {
+                if (this.pncLookupOnly) {
+                    // Skip Koji Lookup
+                    localchecksumMap.clear();
+                    checksums.clear();
+                    continue;
+                }
+
                 kojiBuildsNew = findBuilds(map);
                 allBuilds.putAll(kojiBuildsNew);
                 LOGGER.debug(
@@ -1528,5 +1546,9 @@ public class BuildFinder
         if (pncBuildFinder != null) {
             pncBuildFinder.setListener(listener);
         }
+    }
+
+    public void allowKojiLookup() {
+        this.pncLookupOnly = false;
     }
 }
