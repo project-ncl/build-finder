@@ -1402,9 +1402,11 @@ junit.jupiter.execution.parallel.config.dynamic.factor=1</configurationParameter
         <artifactId>editorconfig-maven-plugin</artifactId>
         <configuration>
           <excludes>
-            <exclude>.cache/*</exclude>
-            <exclude>.vs*/*</exclude>
-            <exclude>*.bak</exclude>
+            <exclude>.c*/**</exclude>
+            <exclude>.idea/**</exclude>
+            <exclude>**/*.bak</exclude>
+            <exclude>**/*.html</exclude>
+            <exclude>**/*.patch</exclude>
           </excludes>
         </configuration>
         <executions>
