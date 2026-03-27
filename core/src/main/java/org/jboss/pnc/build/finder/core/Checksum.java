@@ -23,7 +23,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -33,8 +32,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.Strings;
@@ -58,7 +55,7 @@ public class Checksum implements Comparable<Checksum>, Serializable {
     @Serial
     private static final long serialVersionUID = -7347509034711302799L;
 
-    private static final int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 8192;
 
     private ChecksumType type;
 
@@ -98,19 +95,8 @@ public class Checksum implements Comparable<Checksum>, Serializable {
 
     public static Set<Checksum> checksum(FileObject fo, Collection<ChecksumType> checksumTypes, String root)
             throws IOException {
-        Map<ChecksumType, MessageDigest> mds = new EnumMap<>(ChecksumType.class);
-
-        for (ChecksumType checksumType : checksumTypes) {
-            try {
-                mds.put(checksumType, MessageDigest.getInstance(checksumType.getAlgorithm()));
-            } catch (NoSuchAlgorithmException e) {
-                throw new IOException(e);
-            }
-        }
-
         int checksumTypesSize = checksumTypes.size();
-        Collection<CompletableFuture<Void>> futures = new ArrayList<>(checksumTypesSize);
-        Map<ChecksumType, CompletableFuture<Checksum>> futures2 = new EnumMap<>(ChecksumType.class);
+        Set<Checksum> results = new HashSet<>(checksumTypesSize, 1.0f);
         FileName filename = fo.getName();
         long fileSize;
 
@@ -137,118 +123,95 @@ public class Checksum implements Comparable<Checksum>, Serializable {
                     }
                 }
 
+                String normalizedPath = Utils.normalizePath(fo, root);
+
                 for (ChecksumType checksumType : checksumTypes) {
                     LOGGER.debug("Handle checksum type {} for RPM {}", checksumType.getAlgorithm(), filename);
-
-                    CompletableFuture<Checksum> future;
 
                     switch (checksumType) {
                         case md5 -> {
                             Object md5 = in.getSignatureHeader().getTag(RpmSignatureTag.MD5);
 
-                            if (!(md5 instanceof byte[])) {
+                            if (md5 instanceof byte[] md5Bytes) {
+                                results.add(
+                                        new Checksum(
+                                                checksumType,
+                                                Hex.encodeHexString(md5Bytes),
+                                                normalizedPath,
+                                                fileSize));
+                            } else {
                                 throw new IOException("Missing " + checksumType.getAlgorithm() + " for " + fo);
                             }
-
-                            String sigmd5 = Hex.encodeHexString((byte[]) md5);
-
-                            future = CompletableFuture.supplyAsync(
-                                    () -> new Checksum(checksumType, sigmd5, Utils.normalizePath(fo, root), fileSize));
-
-                            futures2.put(checksumType, future);
                         }
                         case sha1 -> {
                             Object sha1 = in.getSignatureHeader().getTag(RpmSignatureTag.SHA1HEADER);
 
-                            if (!(sha1 instanceof byte[])) {
+                            if (sha1 instanceof String sha1Hex) {
+                                results.add(new Checksum(checksumType, sha1Hex, normalizedPath, fileSize));
+                            } else if (sha1 instanceof byte[] sha1Bytes) {
+                                results.add(
+                                        new Checksum(
+                                                checksumType,
+                                                Hex.encodeHexString(sha1Bytes),
+                                                normalizedPath,
+                                                fileSize));
+                            } else {
                                 LOGGER.warn("Missing {} for {}", red(checksumType.getAlgorithm()), red(fo));
-                                break;
                             }
-
-                            String sigsha1 = Hex.encodeHexString((byte[]) sha1);
-
-                            future = CompletableFuture.supplyAsync(
-                                    () -> new Checksum(checksumType, sigsha1, Utils.normalizePath(fo, root), fileSize));
-
-                            futures2.put(checksumType, future);
                         }
                         case sha256 -> {
                             Object sha256 = in.getSignatureHeader().getTag(RpmSignatureTag.SHA256HEADER);
 
-                            if (!(sha256 instanceof byte[])) {
+                            if (sha256 instanceof String sha256Hex) {
+                                results.add(new Checksum(checksumType, sha256Hex, normalizedPath, fileSize));
+                            } else if (sha256 instanceof byte[] sha256Bytes) {
+                                results.add(
+                                        new Checksum(
+                                                checksumType,
+                                                Hex.encodeHexString(sha256Bytes),
+                                                normalizedPath,
+                                                fileSize));
+                            } else {
                                 LOGGER.warn("Missing {} for {}", red(checksumType.getAlgorithm()), red(fo));
-                                break;
                             }
-
-                            String sigsha256 = Hex.encodeHexString((byte[]) sha256);
-
-                            future = CompletableFuture.supplyAsync(
-                                    () -> new Checksum(
-                                            checksumType,
-                                            sigsha256,
-                                            Utils.normalizePath(fo, root),
-                                            fileSize));
-
-                            futures2.put(checksumType, future);
                         }
                         default -> throw new IOException("Unrecognized checksum type: " + checksumType.getAlgorithm());
                     }
                 }
             }
         } else {
+            Map<ChecksumType, MessageDigest> mds = new EnumMap<>(ChecksumType.class);
+
+            for (ChecksumType checksumType : checksumTypes) {
+                try {
+                    mds.put(checksumType, MessageDigest.getInstance(checksumType.getAlgorithm()));
+                } catch (NoSuchAlgorithmException e) {
+                    throw new IOException(e);
+                }
+            }
+
             try (FileContent fc = fo.getContent(); InputStream is = fc.getInputStream()) {
                 fileSize = determineFileSize(fc);
                 byte[] buffer = new byte[BUFFER_SIZE];
                 int read;
 
                 while ((read = is.read(buffer)) > 0) {
-                    int len = read;
-
-                    for (ChecksumType checksumType : checksumTypes) {
-                        CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
-                            MessageDigest md = mds.get(checksumType);
-                            md.update(buffer, 0, len);
-                            return null;
-                        });
-
-                        futures.add(future);
+                    for (MessageDigest md : mds.values()) {
+                        md.update(buffer, 0, read);
                     }
-
-                    for (CompletableFuture<Void> future : futures) {
-                        future.join();
-                    }
-
-                    futures.clear();
                 }
             }
+
+            String normalizedPath = Utils.normalizePath(fo, root);
 
             for (ChecksumType checksumType : checksumTypes) {
-                CompletableFuture<Checksum> future = CompletableFuture.supplyAsync(() -> {
-                    MessageDigest md = mds.get(checksumType);
-                    return new Checksum(
-                            checksumType,
-                            Hex.encodeHexString(md.digest()),
-                            Utils.normalizePath(fo, root),
-                            fileSize);
-                });
-
-                futures2.put(checksumType, future);
-            }
-        }
-
-        Set<Checksum> results = new HashSet<>(checksumTypesSize, 1.0f);
-
-        for (ChecksumType checksumType : checksumTypes) {
-            try {
-                CompletableFuture<Checksum> future = futures2.get(checksumType);
-
-                if (future != null) {
-                    results.add(future.get());
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } catch (ExecutionException e) {
-                throw new IOException(e);
+                MessageDigest md = mds.get(checksumType);
+                results.add(
+                        new Checksum(
+                                checksumType,
+                                Hex.encodeHexString(md.digest()),
+                                normalizedPath,
+                                fileSize));
             }
         }
 
