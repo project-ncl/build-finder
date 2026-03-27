@@ -21,15 +21,16 @@ import static org.jboss.pnc.build.finder.core.AnsiUtils.red;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.codec.binary.Hex;
@@ -60,6 +61,8 @@ public final class BuildFinderUtils {
     public static final String BUILD_ID_ZERO = "0";
 
     private List<String> archiveExtensions;
+
+    private Set<String> skipExtensions;
 
     private final BuildConfig config;
 
@@ -136,16 +139,8 @@ public final class BuildFinderUtils {
     }
 
     private boolean shouldSkipExtension(Collection<String> filenames) {
-        Collection<String> newArchiveExtensions = new ArrayList<>(archiveExtensions.size() + 1);
-
-        newArchiveExtensions.addAll(archiveExtensions);
-        newArchiveExtensions.add("rpm");
-
-        if (filenames.stream()
-                .noneMatch(
-                        filename -> newArchiveExtensions.stream()
-                                .anyMatch(extension -> filename.endsWith("." + extension)))) {
-            LOGGER.warn("Skipped due to invalid archive extension for files: {}", red(String.join(", ", filenames)));
+        if (filenames.stream().noneMatch(filename -> skipExtensions.contains(FilenameUtils.getExtension(filename)))) {
+            LOGGER.debug("Skipped due to invalid archive extension for files: {}", String.join(", ", filenames));
             return true;
         }
 
@@ -344,7 +339,7 @@ public final class BuildFinderUtils {
         }
     }
 
-    public void loadArchiveExtensions(BuildConfig config, ClientSession session) {
+    private void loadArchiveExtensions(BuildConfig config, ClientSession session) {
         LOGGER.debug("Asking server for archive extensions");
 
         try {
@@ -354,6 +349,9 @@ public final class BuildFinderUtils {
             LOGGER.debug("Getting archive extensions from configuration file");
             archiveExtensions = config.getArchiveExtensions();
         }
+
+        skipExtensions = new HashSet<>(archiveExtensions);
+        skipExtensions.add("rpm");
     }
 
     public List<String> getArchiveExtensions() {

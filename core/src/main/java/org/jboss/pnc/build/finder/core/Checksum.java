@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -219,14 +218,7 @@ public class Checksum implements Comparable<Checksum>, Serializable {
     }
 
     static Optional<Checksum> findByType(Collection<Checksum> checksums, ChecksumType type) {
-        List<Checksum> list = checksums.stream().filter(checksum -> checksum.getType() == type).toList();
-        Checksum checksum = null;
-
-        if (!list.isEmpty()) {
-            checksum = list.get(0);
-        }
-
-        return Optional.ofNullable(checksum);
+        return checksums.stream().filter(checksum -> checksum.getType() == type).findFirst();
     }
 
     public ChecksumType getType() {
