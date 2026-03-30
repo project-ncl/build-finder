@@ -55,7 +55,7 @@ public abstract class ConfigDefaults {
     public static final Boolean DISABLE_RECURSION = Boolean.FALSE;
     public static final List<Pattern> EXCLUDES = List.of(Pattern.compile("^(?!.*/pom\\.xml$).*/.*\\.xml$"));
     public static final URL KOJI_HUB_URL = null;
-    public static final Integer KOJI_MULTICALL_SIZE = 8;
+    public static final Integer KOJI_MULTICALL_SIZE = 150;
     public static final Integer KOJI_NUM_THREADS = 12;
     public static final URL KOJI_WEB_URL = null;
     public static final String OUTPUT_DIR = ".";
