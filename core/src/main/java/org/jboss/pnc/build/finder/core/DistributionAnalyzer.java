@@ -66,12 +66,12 @@ import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -138,8 +138,6 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
 
     private final BasicCacheContainer cacheManager;
 
-    private final AtomicInteger level;
-
     private final ExecutorService pool;
 
     private final Set<ChecksumType> checksumTypesToCheck;
@@ -198,9 +196,8 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
             }
         }
 
-        level = new AtomicInteger();
-        pool = Executors.newWorkStealingPool();
-        fileErrors = new ArrayList<>(FILE_ERRORS_SIZE);
+        pool = Executors.newWorkStealingPool(Runtime.getRuntime().availableProcessors() * 2);
+        fileErrors = new CopyOnWriteArrayList<>();
     }
 
     private static boolean isJavaArchive(FileObject fo) {
@@ -314,7 +311,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                                     green(normalizePath(fo, root)));
                         }
 
-                        listChildren(fo);
+                        listChildren(fo, 0);
 
                         if (fileChecksums != null) {
                             for (ChecksumType checksumType : checksumTypesToCheck) {
@@ -331,7 +328,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                             }
                         }
                     } else {
-                        listChildren(fo);
+                        listChildren(fo, 0);
                     }
                 }
             }
@@ -458,22 +455,23 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                 && Stream.of(manager.getSchemes()).anyMatch(s -> s.equals(fo.getName().getExtension()));
     }
 
-    private boolean isDistributionArchive(FileObject fo) {
-        return level.intValue() == 1 && !isJavaArchive(fo);
+    private boolean isDistributionArchive(FileObject fo, int level) {
+        return level == 1 && !isJavaArchive(fo);
     }
 
-    private boolean isTarArchive(FileObject fo) throws FileSystemException {
+    private boolean isTarArchive(FileObject fo, int level) throws FileSystemException {
         FileObject parent = fo.getParent();
 
-        return level.intValue() == 2 && parent.isFolder() && parent.getName().getFriendlyURI().endsWith(BANG_SLASH)
+        return level == 2 && parent.isFolder() && parent.getName().getFriendlyURI().endsWith(BANG_SLASH)
                 && parent.getChildren().length == 1;
     }
 
-    private boolean shouldListArchive(FileObject fo) throws FileSystemException {
-        return Boolean.FALSE.equals(config.getDisableRecursion()) || isDistributionArchive(fo) || isTarArchive(fo);
+    private boolean shouldListArchive(FileObject fo, int level) throws FileSystemException {
+        return Boolean.FALSE.equals(config.getDisableRecursion()) || isDistributionArchive(fo, level)
+                || isTarArchive(fo, level);
     }
 
-    private void listArchive(FileObject fo) {
+    private void listArchive(FileObject fo, int level) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Creating file system for: {}", normalizePath(fo, root));
         }
@@ -484,9 +482,12 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
         FileSystem fs = null;
 
         try {
-            layered = manager.createFileSystem(fo.getName().getExtension(), fo);
-            fs = layered.getFileSystem();
-            listChildren(layered);
+            synchronized (manager) {
+                layered = manager.createFileSystem(fo.getName().getExtension(), fo);
+                fs = layered.getFileSystem();
+            }
+
+            listChildren(layered, level);
         } catch (IOException e) {
             String filename = normalizePath(fo, root);
             String message = getMessage(e);
@@ -495,7 +496,9 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
             LOGGER.debug("Error", e);
         } finally {
             if (fs != null) {
-                manager.closeFileSystem(fs);
+                synchronized (manager) {
+                    manager.closeFileSystem(fs);
+                }
             }
         }
     }
@@ -538,35 +541,37 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
         return () -> Checksum.checksum(fo, checksumTypesToCheck, root);
     }
 
+    private synchronized void handleChecksumResult(Set<Checksum> checksums) throws IOException {
+        for (ChecksumType checksumType : checksumTypesToCheck) {
+            Optional<Checksum> optionalChecksum = Checksum.findByType(checksums, checksumType);
+            optionalChecksum.ifPresent(
+                    checksum -> map.get(checksumType)
+                            .put(
+                                    checksum.getValue(),
+                                    new LocalFile(checksum.getFilename(), checksum.getFileSize())));
+        }
+
+        for (Checksum checksum : checksums) {
+            inverseMap.put(checksum.getFilename(), checksum);
+        }
+
+        if (queue != null && config.getChecksumTypes().contains(ChecksumType.md5)) {
+            try {
+                for (Checksum checksum : checksums) {
+                    if (checksum.getType() == ChecksumType.md5) {
+                        queue.put(checksum);
+                    }
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException(e);
+            }
+        }
+    }
+
     private void handleFutureChecksum(Future<Set<Checksum>> future) throws IOException {
         try {
-            Set<Checksum> checksums = future.get();
-
-            for (ChecksumType checksumType : checksumTypesToCheck) {
-                Optional<Checksum> optionalChecksum = Checksum.findByType(checksums, checksumType);
-                optionalChecksum.ifPresent(
-                        checksum -> map.get(checksumType)
-                                .put(
-                                        checksum.getValue(),
-                                        new LocalFile(checksum.getFilename(), checksum.getFileSize())));
-            }
-
-            for (Checksum checksum : checksums) {
-                inverseMap.put(checksum.getFilename(), checksum);
-            }
-
-            if (queue != null && config.getChecksumTypes().contains(ChecksumType.md5)) {
-                try {
-                    for (Checksum checksum : checksums) {
-                        if (checksum.getType() == ChecksumType.md5) {
-                            queue.put(checksum);
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new IOException(e);
-                }
-            }
+            handleChecksumResult(future.get());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException(e);
@@ -575,7 +580,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
         }
     }
 
-    private void listChildren(FileObject fo) throws IOException {
+    private void listChildren(FileObject fo, int level) throws IOException {
         List<FileObject> pomFiles = new ArrayList<>(LOCAL_FILES_SIZE);
         List<FileObject> localFiles = new ArrayList<>(LOCAL_FILES_SIZE);
 
@@ -584,24 +589,35 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
             fo.findFiles(pomSelector, true, pomFiles);
             fo.findFiles(new InvertIncludeFileSelector(pomSelector), true, localFiles);
             pomFiles.addAll(localFiles);
-            int numChildren = pomFiles.size();
-            Iterable<Future<Set<Checksum>>> futures;
-            Collection<Callable<Set<Checksum>>> tasks = new ArrayList<>(numChildren);
+            List<Callable<Set<Checksum>>> checksumTasks = new ArrayList<>(pomFiles.size());
+            List<Future<?>> archiveFutures = new ArrayList<>();
 
             if (isMainJar(fo)) {
                 List<LicenseInfo> licenseInfos = addLicensesFromJar(fo, pomFiles);
                 putLicenses(Utils.normalizePath(fo, root), licenseInfos);
             }
 
+            boolean isTarFileSystem = "tar".equals(fo.getName().getScheme());
+            List<FileObject> deferredChecksumFiles = new ArrayList<>();
+
             for (FileObject file : pomFiles) {
                 if (file.isFile()) {
+                    boolean willListArchive = false;
+                    int archiveDepth = level + 1;
+
+                    if (isArchive(file)) {
+                        willListArchive = shouldListArchive(file, archiveDepth);
+                    }
+
                     if (!checksumTypesToCheck.isEmpty()) {
                         if (includeFile(file)) {
                             if ("tar".equals(file.getName().getScheme())) {
-                                Future<Set<Checksum>> future = pool.submit(checksumTask(file));
-                                handleFutureChecksum(future);
+                                Set<Checksum> checksums = Checksum.checksum(file, checksumTypesToCheck, root);
+                                handleChecksumResult(checksums);
+                            } else if (willListArchive) {
+                                deferredChecksumFiles.add(file);
                             } else {
-                                tasks.add(checksumTask(file));
+                                checksumTasks.add(checksumTask(file));
                             }
                         }
                     }
@@ -625,32 +641,44 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                         }
                     }
 
-                    if (isArchive(file)) {
-                        level.incrementAndGet();
-
-                        if (shouldListArchive(file)) {
-                            listArchive(file);
+                    if (willListArchive) {
+                        if (isTarFileSystem) {
+                            listArchive(file, archiveDepth);
+                        } else {
+                            archiveFutures.add(pool.submit(() -> {
+                                listArchive(file, archiveDepth);
+                                return null;
+                            }));
                         }
-
-                        level.decrementAndGet();
                     }
                 }
             }
 
-            int tasksSize = tasks.size();
-
-            if (tasksSize > 0) {
-                LOGGER.debug("Number of checksum tasks: {}", tasksSize);
-
+            for (Future<?> future : archiveFutures) {
                 try {
-                    futures = pool.invokeAll(tasks);
+                    future.get();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new IOException(e);
+                } catch (ExecutionException e) {
+                    throw new IOException(e);
                 }
+            }
 
-                for (Future<Set<Checksum>> future : futures) {
-                    handleFutureChecksum(future);
+            for (FileObject file : deferredChecksumFiles) {
+                checksumTasks.add(checksumTask(file));
+            }
+
+            if (!checksumTasks.isEmpty()) {
+                LOGGER.debug("Number of checksum tasks: {}", checksumTasks.size());
+
+                try {
+                    for (Future<Set<Checksum>> future : pool.invokeAll(checksumTasks)) {
+                        handleFutureChecksum(future);
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException(e);
                 }
             }
         } finally {
@@ -690,13 +718,10 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
             licenseInfos = Collections.emptyList();
         }
 
-        // Second license pass which looks for relative file URLs, e.g., names such as META-INF/LICENSE
         licenseInfos.stream()
                 .filter(licenseInfo -> NOASSERTION.equals(licenseInfo.getSpdxLicenseId()))
                 .forEach(licenseInfo -> handleRelativeURL(jar, localFile, licenseInfo));
 
-        // If there are any licenses still unmatched, print them, but ignore unmatched files that were already checked
-        // in the last step
         if (LOGGER.isWarnEnabled()) {
             licenseInfos.stream()
                     .filter(licenseInfo -> NOASSERTION.equals(licenseInfo.getSpdxLicenseId()))
@@ -858,7 +883,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
         }
     }
 
-    private void putLicenses(String pomOrJarFile, Collection<LicenseInfo> licenseInfos) {
+    private synchronized void putLicenses(String pomOrJarFile, Collection<LicenseInfo> licenseInfos) {
         Collection<LicenseInfo> existingLicenses = licensesMap.get(pomOrJarFile);
 
         if (existingLicenses != null) {
