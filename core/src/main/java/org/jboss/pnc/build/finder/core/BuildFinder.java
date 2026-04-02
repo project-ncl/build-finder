@@ -48,6 +48,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -99,7 +100,11 @@ public class BuildFinder
 
     private static final int NOT_FOUND_CHECKSUMS_SIZE = 8996;
 
-    private static final int ALL_KOJI_BUILDS_SIZE = 1835;
+    private static final int MAX_RETRIES = 3;
+
+    private static final long RETRY_INITIAL_WAIT_SECONDS = 10L;
+
+    private static final long RETRY_MAX_WAIT_SECONDS = 60L;
 
     private final ClientSession session;
 
@@ -719,18 +724,19 @@ public class BuildFinder
         int chunkSize = config.getKojiMulticallSize();
         List<List<Entry<Checksum, Collection<String>>>> chunks = ListUtils.partition(checksums, chunkSize);
         int numChunks = chunks.size();
-        Collection<KojiArchiveQuery> allQueries = new ArrayList<>(numChecksums);
+        List<List<KojiArchiveQuery>> chunkQueries = new ArrayList<>(numChunks);
 
         if (numChecksums > 0) {
-            LOGGER.debug("Looking up {} checksums", green(numChecksums));
-            LOGGER.debug("Using {} chunks of size {}", green(numChunks), green(chunkSize));
-
-            Collection<Callable<List<List<KojiArchiveInfo>>>> tasks = new ArrayList<>(numChecksums);
+            LOGGER.info(
+                    "Looking up {} checksums in {} chunks of size {}",
+                    green(numChecksums),
+                    green(numChunks),
+                    green(chunkSize));
+            LOGGER.debug("Using {} threads", green(numThreads));
 
             for (int i = 0; i < numChunks; i++) {
-                int chunkNumber = i + 1;
                 List<Entry<Checksum, Collection<String>>> chunk = chunks.get(i);
-                List<KojiArchiveQuery> queries = new ArrayList<>(numChunks);
+                List<KojiArchiveQuery> queries = new ArrayList<>(chunk.size());
 
                 for (Entry<Checksum, Collection<String>> entry : chunk) {
                     Checksum checksum = entry.getKey();
@@ -742,40 +748,11 @@ public class BuildFinder
                 }
 
                 if (!queries.isEmpty()) {
-                    int querySize = queries.size();
-
-                    LOGGER.debug("Added {} queries", green(querySize));
-
-                    allQueries.addAll(queries);
-
-                    tasks.add(() -> {
-                        LOGGER.debug("Looking up checksums for chunk {}/{}", green(chunkNumber), green(numChunks));
-                        return session.listArchives(queries);
-                    });
+                    chunkQueries.add(queries);
                 }
             }
 
-            try {
-                List<Future<List<List<KojiArchiveInfo>>>> futures = pool.invokeAll(tasks);
-
-                for (Future<List<List<KojiArchiveInfo>>> future : futures) {
-                    try {
-                        List<List<KojiArchiveInfo>> archiveFutures = future.get();
-                        archives.addAll(archiveFutures);
-                    } catch (ExecutionException e) {
-                        Utils.shutdownAndAwaitTermination(pool);
-                        LOGGER.error("Error getting Koji archives: {}", boldRed(getAllErrorMessages(e)));
-                        LOGGER.debug("Error", e);
-                        throw new KojiClientException("Error getting Koji archives", e);
-                    }
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Utils.shutdownAndAwaitTermination(pool);
-                LOGGER.error("Koji archive thread interrupted: {}", boldRed(getAllErrorMessages(e)));
-                LOGGER.debug("Error", e);
-                throw new KojiClientException("Koji archive thread interrupted", e);
-            }
+            archives.addAll(queryArchivesWithRetry(chunkQueries, pool));
         }
 
         List<KojiArchiveInfo> archivesToEnrich = archives.stream().flatMap(List::stream).toList();
@@ -785,6 +762,7 @@ public class BuildFinder
         /*
          * For any KojiArchiveInfo, create a protobuf wrapper and add it to the checksum cache.
          */
+        List<KojiArchiveQuery> allQueries = chunkQueries.stream().flatMap(List::stream).toList();
         Iterator<KojiArchiveQuery> itqueries = allQueries.iterator();
 
         for (List<KojiArchiveInfo> archiveList : archives) {
@@ -876,20 +854,7 @@ public class BuildFinder
             }
 
             Future<List<List<KojiArchiveInfo>>> futureArchiveInfos = pool.submit(() -> session.listArchives(queries));
-            List<KojiBuildInfo> archiveBuilds;
-            List<List<KojiArchiveInfo>> archiveInfos;
-
-            try {
-                archiveBuilds = futureArchiveBuilds.get();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Utils.shutdownAndAwaitTermination(pool);
-                throw new KojiClientException("Error getting archive build futures", e);
-            } catch (ExecutionException e) {
-                Utils.shutdownAndAwaitTermination(pool);
-                throw new KojiClientException("Error getting archive build futures", e);
-            }
-
+            List<KojiBuildInfo> archiveBuilds = awaitFuture(futureArchiveBuilds, pool, "getBuild");
             List<Integer> taskIds = new ArrayList<>(archiveBuilds.size());
 
             for (KojiBuildInfo archiveBuild : archiveBuilds) {
@@ -899,6 +864,7 @@ public class BuildFinder
                     taskIds.add(taskId);
                 }
             }
+
             int taskIdsSize = taskIds.size();
             Future<List<KojiTaskInfo>> futureTaskInfos = null;
 
@@ -909,24 +875,11 @@ public class BuildFinder
                 futureTaskInfos = pool.submit(() -> session.getTaskInfo(taskIds, requests));
             }
 
-            List<List<KojiTagInfo>> tagInfos;
-            List<KojiTaskInfo> taskInfos = Collections.emptyList();
-
-            try {
-                tagInfos = futureTagInfos.get();
-                archiveInfos = futureArchiveInfos.get();
-
-                if (futureTaskInfos != null) {
-                    taskInfos = futureTaskInfos.get();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                Utils.shutdownAndAwaitTermination(pool);
-                throw new KojiClientException("Error getting tag, archive, or taskinfo futures", e);
-            } catch (ExecutionException e) {
-                Utils.shutdownAndAwaitTermination(pool);
-                throw new KojiClientException("Error getting tag, archive, or taskinfo futures", e);
-            }
+            List<List<KojiTagInfo>> tagInfos = awaitFuture(futureTagInfos, pool, "listTags");
+            List<List<KojiArchiveInfo>> archiveInfos = awaitFuture(futureArchiveInfos, pool, "listArchives");
+            List<KojiTaskInfo> taskInfos = futureTaskInfos != null
+                    ? awaitFuture(futureTaskInfos, pool, "getTaskInfo")
+                    : Collections.emptyList();
 
             Iterator<KojiBuildInfo> itbuilds = archiveBuilds.iterator();
             Iterator<List<KojiTagInfo>> ittags = tagInfos.iterator();
@@ -1153,6 +1106,112 @@ public class BuildFinder
         buildsFoundList = buildsList.size() > 1 ? buildsList.subList(1, buildsList.size()) : Collections.emptyList();
 
         return Collections.unmodifiableMap(builds);
+    }
+
+    private <T> T awaitFuture(Future<T> future, ExecutorService pool, String context) throws KojiClientException {
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Utils.shutdownAndAwaitTermination(pool);
+            throw new KojiClientException("Interrupted: " + context, e);
+        } catch (ExecutionException e) {
+            Utils.shutdownAndAwaitTermination(pool);
+            throw new KojiClientException("Error: " + context, e);
+        }
+    }
+
+    private List<List<KojiArchiveInfo>> queryArchivesWithRetry(
+            List<List<KojiArchiveQuery>> chunkQueries,
+            ExecutorService pool) throws KojiClientException {
+        int numChunks = chunkQueries.size();
+        List<Future<List<List<KojiArchiveInfo>>>> futures = new ArrayList<>(numChunks);
+
+        for (int i = 0; i < numChunks; i++) {
+            int chunkNumber = i + 1;
+            List<KojiArchiveQuery> queries = chunkQueries.get(i);
+            futures.add(pool.submit(() -> {
+                LOGGER.debug("Looking up checksums for chunk {}/{}", green(chunkNumber), green(numChunks));
+                return session.listArchives(queries);
+            }));
+        }
+
+        List<List<KojiArchiveInfo>> archives = new ArrayList<>(numChunks);
+
+        for (int i = 0; i < numChunks; i++) {
+            archives.addAll(collectChunkResult(futures.get(i), chunkQueries.get(i), i + 1, numChunks, pool));
+            LOGGER.info("Completed chunk {}/{}", green(i + 1), green(numChunks));
+        }
+
+        return archives;
+    }
+
+    private List<List<KojiArchiveInfo>> collectChunkResult(
+            Future<List<List<KojiArchiveInfo>>> initialFuture,
+            List<KojiArchiveQuery> queries,
+            int chunkNumber,
+            int numChunks,
+            ExecutorService pool) throws KojiClientException {
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                Future<List<List<KojiArchiveInfo>>> future = attempt == 1
+                        ? initialFuture
+                        : pool.submit(() -> session.listArchives(queries));
+                return future.get();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Utils.shutdownAndAwaitTermination(pool);
+                LOGGER.error("Koji archive thread interrupted: {}", boldRed(getAllErrorMessages(e)));
+                LOGGER.debug("Error", e);
+                throw new KojiClientException("Koji archive thread interrupted", e);
+            } catch (ExecutionException e) {
+                String checksumValues = queries.stream()
+                        .map(KojiArchiveQuery::getChecksum)
+                        .collect(Collectors.joining(", "));
+
+                if (attempt < MAX_RETRIES) {
+                    long waitSeconds = Math.min(
+                            RETRY_INITIAL_WAIT_SECONDS << (attempt - 1),
+                            RETRY_MAX_WAIT_SECONDS);
+
+                    LOGGER.warn(
+                            "Chunk {}/{} failed (attempt {}/{}): {}. Checksums: [{}]. Retrying in {} s...",
+                            boldRed(chunkNumber),
+                            boldRed(numChunks),
+                            boldRed(attempt),
+                            boldRed(MAX_RETRIES),
+                            boldRed(getAllErrorMessages(e)),
+                            checksumValues,
+                            green(waitSeconds));
+
+                    try {
+                        TimeUnit.SECONDS.sleep(waitSeconds);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        Utils.shutdownAndAwaitTermination(pool);
+                        throw new KojiClientException(
+                                "Interrupted while waiting to retry chunk " + chunkNumber + "/" + numChunks,
+                                ie);
+                    }
+                } else {
+                    LOGGER.error(
+                            "Chunk {}/{} failed after {} attempts: {}. Checksums: [{}]",
+                            boldRed(chunkNumber),
+                            boldRed(numChunks),
+                            boldRed(MAX_RETRIES),
+                            boldRed(getAllErrorMessages(e)),
+                            checksumValues);
+                    LOGGER.debug("Error", e);
+
+                    Utils.shutdownAndAwaitTermination(pool);
+                    throw new KojiClientException(
+                            "Error getting Koji archives for chunk " + chunkNumber + "/" + numChunks,
+                            e);
+                }
+            }
+        }
+
+        throw new KojiClientException("Retry loop exhausted for chunk " + chunkNumber + "/" + numChunks);
     }
 
     private void markFound(Entry<Checksum, Collection<String>> entry) {
