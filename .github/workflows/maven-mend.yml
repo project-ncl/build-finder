@@ -3,7 +3,7 @@ name: Mend CLI scan for Maven
 on:
   push:
     branches:
-      - main
+      - master
   schedule:
     - cron: "0 22 * * 0"
 
@@ -15,8 +15,14 @@ permissions:
   security-events: write
 
 jobs:
-  call-maven-mend-ci:
-    uses: project-ncl/shared-github-actions/.github/workflows/maven-mend-ci.yml@daec766bf11d85450690879a7ae58774f02040b7 # main
+  build:
+    uses: project-ncl/shared-github-actions/.github/workflows/maven-ci.yml@dc16c38747e72ec04165d5e5e0177e85d21bc5c8 # main
+    with:
+      upload_artifacts: true
+
+  call-mend-ci:
+    needs: build
+    uses: project-ncl/shared-github-actions/.github/workflows/mend-ci.yml@dc16c38747e72ec04165d5e5e0177e85d21bc5c8 # main
     with:
       SCA: true
       SAST: true
