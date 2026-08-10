@@ -178,6 +178,14 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- 4.1.84.Final via vertx-core, TODO: remove when bumped by vertx -->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>4.1.137.Final</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>io.smallrye.common</groupId>
         <artifactId>smallrye-common-bom</artifactId>
