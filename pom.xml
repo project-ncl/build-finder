@@ -74,8 +74,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipITs>true</skipITs>
     <version.central-publishing-maven-plugin>0.10.0</version.central-publishing-maven-plugin>
-    <version.ch.qos.logback>1.5.33</version.ch.qos.logback>
-    <version.com.fasterxml.jackson>2.22.0</version.com.fasterxml.jackson>
+    <version.ch.qos.logback>1.5.38</version.ch.qos.logback>
+    <version.com.fasterxml.jackson>2.22.1</version.com.fasterxml.jackson>
     <version.com.ginsberg.junit5-system-exit>2.0.2</version.com.ginsberg.junit5-system-exit>
     <version.com.github.ekryd.sortpom>4.0.0</version.com.github.ekryd.sortpom>
     <version.com.github.luben>1.5.7-7</version.com.github.luben>
@@ -102,7 +102,7 @@
     <version.org.apache.commons.commons-compress>1.28.0</version.org.apache.commons.commons-compress>
     <version.org.apache.commons.commons-lang3>3.20.0</version.org.apache.commons.commons-lang3>
     <version.org.apache.commons.commons-vfs2>2.10.0</version.org.apache.commons.commons-vfs2>
-    <version.org.apache.httpcomponents.client5>5.6.1</version.org.apache.httpcomponents.client5>
+    <version.org.apache.httpcomponents.client5>5.6.4</version.org.apache.httpcomponents.client5>
     <version.org.apache.httpcomponents.httpasyncclient>4.1.5</version.org.apache.httpcomponents.httpasyncclient>
     <version.org.apache.httpcomponents.httpclient>4.5.14</version.org.apache.httpcomponents.httpclient>
     <version.org.apache.httpcomponents.httpcore>4.4.16</version.org.apache.httpcomponents.httpcore>
@@ -136,7 +136,7 @@
     <version.org.codehaus.plexus.plexus-classworlds>2.10.0</version.org.codehaus.plexus.plexus-classworlds>
     <version.org.codehaus.plexus.plexus-component-annotations>2.2.0</version.org.codehaus.plexus.plexus-component-annotations>
     <version.org.codehaus.plexus.plexus-component-metadata>2.2.0</version.org.codehaus.plexus.plexus-component-metadata>
-    <version.org.codehaus.plexus.plexus-utils>3.6.0</version.org.codehaus.plexus.plexus-utils>
+    <version.org.codehaus.plexus.plexus-utils>3.6.1</version.org.codehaus.plexus.plexus-utils>
     <version.org.commonjava.atlas>1.2.2</version.org.commonjava.atlas>
     <version.org.commonjava.rwx>2.5</version.org.commonjava.rwx>
     <version.org.commonjava.util.jhttpc>1.17</version.org.commonjava.util.jhttpc>
@@ -150,13 +150,13 @@
     <version.org.jacoco>0.8.14</version.org.jacoco>
     <version.org.jboss.byteman>4.0.26</version.org.jboss.byteman>
     <version.org.jboss.logging>3.6.3.Final</version.org.jboss.logging>
-    <version.org.jboss.logmanager>3.2.1.Final</version.org.jboss.logmanager>
+    <version.org.jboss.logmanager>3.2.2.Final</version.org.jboss.logmanager>
     <version.org.jboss.pnc.pnc>3.4.4</version.org.jboss.pnc.pnc>
     <version.org.jboss.pnc.pnc-api>3.4.4</version.org.jboss.pnc.pnc-api>
     <version.org.jeasy>5.0.0</version.org.jeasy>
     <version.org.jetbrains.kotlin>1.6.21</version.org.jetbrains.kotlin>
     <version.org.json.json>20200518</version.org.json.json>
-    <version.org.jsoup>1.22.2</version.org.jsoup>
+    <version.org.jsoup>1.23.1</version.org.jsoup>
     <version.org.junit>6.0.3</version.org.junit>
     <version.org.junit-pioneer>2.3.0</version.org.junit-pioneer>
     <version.org.mockito>5.2.0</version.org.mockito>
@@ -175,6 +175,14 @@
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${version.com.fasterxml.jackson}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- 4.1.84.Final via vertx-core, TODO: remove when bumped by vertx -->
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>4.1.137.Final</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -634,6 +642,13 @@
             <artifactId>log4j-over-slf4j</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <!-- 1.1.7 via jboss-logmanager, TODO: remove when bumped by logmanager -->
+      <dependency>
+        <groupId>org.eclipse.parsson</groupId>
+        <artifactId>parsson</artifactId>
+        <version>1.1.8</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.jboss.logmanager</groupId>
