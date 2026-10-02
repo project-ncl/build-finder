@@ -446,11 +446,10 @@
         <artifactId>pnc-api</artifactId>
         <version>${version.org.jboss.pnc.pnc-api}</version>
       </dependency>
-      <!-- Required due to version alignment issue in PNC 3.4.3 -->
       <dependency>
         <groupId>org.jboss.pnc</groupId>
         <artifactId>pnc-api-constants</artifactId>
-        <version>${version.org.jboss.pnc.pnc}</version>
+        <version>${version.org.jboss.pnc.pnc-api}</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.pnc</groupId>
