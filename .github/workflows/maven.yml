@@ -16,6 +16,9 @@
 
 name: Build Finder CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches-ignore:
