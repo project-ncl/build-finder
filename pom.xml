@@ -82,13 +82,15 @@
     <version.com.github.luben>1.5.7-15</version.com.github.luben>
     <version.com.github.spotbugs.spotbugs>4.9.8</version.com.github.spotbugs.spotbugs>
     <version.com.github.spotbugs.spotbugs-maven-plugin>4.9.8.3</version.com.github.spotbugs.spotbugs-maven-plugin>
+    <version.com.google.code.gson>2.14.0</version.com.google.code.gson>
+    <version.com.google.errorprone>2.50.0</version.com.google.errorprone>
     <version.com.google.guava.failureaccess>1.0.3</version.com.google.guava.failureaccess>
-    <version.com.google.guava.guava>33.5.0-jre</version.com.google.guava.guava>
+    <version.com.google.guava.guava>33.7.2-jre</version.com.google.guava.guava>
     <version.com.j2html>1.6.0</version.com.j2html>
     <version.com.mycila>5.0.0</version.com.mycila>
     <version.com.puppycrawl.tools>13.4.0</version.com.puppycrawl.tools>
     <version.com.redhat.red.build.kojiji>2.25</version.com.redhat.red.build.kojiji>
-    <version.commons-codec>1.21.0</version.commons-codec>
+    <version.commons-codec>1.22.1</version.commons-codec>
     <version.commons-io>2.22.0</version.commons-io>
     <version.commons-validator>1.10.1</version.commons-validator>
     <version.info.picocli>4.7.7</version.info.picocli>
@@ -107,16 +109,16 @@
     <version.org.apache.httpcomponents.httpasyncclient>4.1.5</version.org.apache.httpcomponents.httpasyncclient>
     <version.org.apache.httpcomponents.httpclient>4.5.14</version.org.apache.httpcomponents.httpclient>
     <version.org.apache.httpcomponents.httpcore>4.4.16</version.org.apache.httpcomponents.httpcore>
-    <version.org.apache.maven>3.9.14</version.org.apache.maven>
+    <version.org.apache.maven>3.10.0</version.org.apache.maven>
     <version.org.apache.maven.plugins.maven-project-info-reports-plugin>3.9.0</version.org.apache.maven.plugins.maven-project-info-reports-plugin>
     <version.org.apache.maven.plugins.maven-shade-plugin>3.6.2</version.org.apache.maven.plugins.maven-shade-plugin>
     <version.org.apache.maven.plugins.maven-surefire-plugin>3.6.0</version.org.apache.maven.plugins.maven-surefire-plugin>
     <version.org.assertj>3.27.7</version.org.assertj>
     <version.org.bouncycastle>1.85</version.org.bouncycastle>
-    <version.org.codehaus.plexus.plexus-classworlds>2.10.0</version.org.codehaus.plexus.plexus-classworlds>
+    <version.org.codehaus.plexus.plexus-classworlds>2.12.1</version.org.codehaus.plexus.plexus-classworlds>
     <version.org.codehaus.plexus.plexus-component-annotations>2.2.0</version.org.codehaus.plexus.plexus-component-annotations>
     <version.org.codehaus.plexus.plexus-component-metadata>2.2.0</version.org.codehaus.plexus.plexus-component-metadata>
-    <version.org.codehaus.plexus.plexus-utils>3.6.1</version.org.codehaus.plexus.plexus-utils>
+    <version.org.codehaus.plexus.plexus-utils>3.6.2</version.org.codehaus.plexus.plexus-utils>
     <version.org.commonjava.atlas>1.2.2</version.org.commonjava.atlas>
     <version.org.commonjava.rwx>2.5</version.org.commonjava.rwx>
     <version.org.commonjava.util.jhttpc>1.17</version.org.commonjava.util.jhttpc>
@@ -137,15 +139,16 @@
     <version.org.jetbrains.kotlin>1.6.21</version.org.jetbrains.kotlin>
     <version.org.json.json>20200518</version.org.json.json>
     <version.org.jsoup>1.23.2</version.org.jsoup>
+    <version.org.jspecify>1.0.1</version.org.jspecify>
     <version.org.junit>6.0.3</version.org.junit>
     <version.org.junit-pioneer>2.3.0</version.org.junit-pioneer>
     <version.org.mockito>5.2.0</version.org.mockito>
     <version.org.mockito-junit-jupiter>5.23.0</version.org.mockito-junit-jupiter>
     <version.org.ow2.asm>9.10.1</version.org.ow2.asm>
     <version.org.reactive-streams>1.0.4</version.org.reactive-streams>
-    <version.org.slf4j>2.0.18</version.org.slf4j>
+    <version.org.slf4j>2.0.19</version.org.slf4j>
     <version.org.spdx.java-spdx-library>2.0.3</version.org.spdx.java-spdx-library>
-    <version.org.spdx.spdx-java-core>1.0.3</version.org.spdx.spdx-java-core>
+    <version.org.spdx.spdx-java-core>1.0.5</version.org.spdx.spdx-java-core>
     <version.org.wiremock>3.13.2</version.org.wiremock>
   </properties>
 
@@ -203,6 +206,18 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
         <version>${version.ch.qos.logback}</version>
+      </dependency>
+      <!-- Required dependency for java-spdx-library -->
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>${version.com.google.code.gson}</version>
+      </dependency>
+      <!-- Required dependency for guava and gson -->
+      <dependency>
+        <groupId>com.google.errorprone</groupId>
+        <artifactId>error_prone_annotations</artifactId>
+        <version>${version.com.google.errorprone}</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -488,6 +503,12 @@
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>${version.org.jsoup}</version>
+      </dependency>
+      <!-- Required dependency for guava -->
+      <dependency>
+        <groupId>org.jspecify</groupId>
+        <artifactId>jspecify</artifactId>
+        <version>${version.org.jspecify}</version>
       </dependency>
       <!-- Required dependency for rxjava and resteasy-jaxrs -->
       <dependency>
