@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.jboss</groupId>
     <artifactId>jboss-parent</artifactId>
-    <version>53</version>
+    <version>54</version>
     <relativePath />
   </parent>
 
@@ -74,7 +74,6 @@
     <maven.compiler.target>17</maven.compiler.target>
     <mavenVersion>3.6.3</mavenVersion>
     <pnc.url />
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipITs>true</skipITs>
     <version.ch.qos.logback>1.5.38</version.ch.qos.logback>
     <version.com.fasterxml.jackson>2.22.1</version.com.fasterxml.jackson>
@@ -109,32 +108,11 @@
     <version.org.apache.httpcomponents.httpclient>4.5.14</version.org.apache.httpcomponents.httpclient>
     <version.org.apache.httpcomponents.httpcore>4.4.16</version.org.apache.httpcomponents.httpcore>
     <version.org.apache.maven>3.9.14</version.org.apache.maven>
-    <version.org.apache.maven.plugins.maven-antrun-plugin>3.2.0</version.org.apache.maven.plugins.maven-antrun-plugin>
-    <version.org.apache.maven.plugins.maven-assembly-plugin>3.8.0</version.org.apache.maven.plugins.maven-assembly-plugin>
-    <version.org.apache.maven.plugins.maven-checkstyle-plugin>3.6.0</version.org.apache.maven.plugins.maven-checkstyle-plugin>
-    <version.org.apache.maven.plugins.maven-clean-plugin>3.5.0</version.org.apache.maven.plugins.maven-clean-plugin>
-    <version.org.apache.maven.plugins.maven-compiler-plugin>3.15.0</version.org.apache.maven.plugins.maven-compiler-plugin>
-    <version.org.apache.maven.plugins.maven-dependency-plugin>3.10.0</version.org.apache.maven.plugins.maven-dependency-plugin>
-    <version.org.apache.maven.plugins.maven-deploy-plugin>3.1.4</version.org.apache.maven.plugins.maven-deploy-plugin>
-    <version.org.apache.maven.plugins.maven-enforcer-plugin>3.6.2</version.org.apache.maven.plugins.maven-enforcer-plugin>
-    <version.org.apache.maven.plugins.maven-gpg-plugin>3.2.8</version.org.apache.maven.plugins.maven-gpg-plugin>
-    <version.org.apache.maven.plugins.maven-install-plugin>3.1.4</version.org.apache.maven.plugins.maven-install-plugin>
-    <version.org.apache.maven.plugins.maven-jar-plugin>3.5.0</version.org.apache.maven.plugins.maven-jar-plugin>
-    <version.org.apache.maven.plugins.maven-javadoc-plugin>3.12.0</version.org.apache.maven.plugins.maven-javadoc-plugin>
-    <version.org.apache.maven.plugins.maven-jxr-plugin>3.6.0</version.org.apache.maven.plugins.maven-jxr-plugin>
-    <version.org.apache.maven.plugins.maven-plugin-plugin>3.15.2</version.org.apache.maven.plugins.maven-plugin-plugin>
-    <version.org.apache.maven.plugins.maven-pmd-plugin>3.28.0</version.org.apache.maven.plugins.maven-pmd-plugin>
     <version.org.apache.maven.plugins.maven-project-info-reports-plugin>3.9.0</version.org.apache.maven.plugins.maven-project-info-reports-plugin>
-    <version.org.apache.maven.plugins.maven-release-plugin>3.3.1</version.org.apache.maven.plugins.maven-release-plugin>
-    <version.org.apache.maven.plugins.maven-resources-plugin>3.5.0</version.org.apache.maven.plugins.maven-resources-plugin>
     <version.org.apache.maven.plugins.maven-shade-plugin>3.6.2</version.org.apache.maven.plugins.maven-shade-plugin>
-    <version.org.apache.maven.plugins.maven-site-plugin>3.21.0</version.org.apache.maven.plugins.maven-site-plugin>
-    <version.org.apache.maven.plugins.maven-source-plugin>3.4.0</version.org.apache.maven.plugins.maven-source-plugin>
-    <version.org.apache.maven.plugins.maven-surefire-plugin>3.5.5</version.org.apache.maven.plugins.maven-surefire-plugin>
+    <version.org.apache.maven.plugins.maven-surefire-plugin>3.6.0</version.org.apache.maven.plugins.maven-surefire-plugin>
     <version.org.assertj>3.27.7</version.org.assertj>
     <version.org.bouncycastle>1.85</version.org.bouncycastle>
-    <version.org.codehaus.mojo.buildnumber-maven-plugin>3.3.0</version.org.codehaus.mojo.buildnumber-maven-plugin>
-    <version.org.codehaus.mojo.versions-maven-plugin>2.21.0</version.org.codehaus.mojo.versions-maven-plugin>
     <version.org.codehaus.plexus.plexus-classworlds>2.10.0</version.org.codehaus.plexus.plexus-classworlds>
     <version.org.codehaus.plexus.plexus-component-annotations>2.2.0</version.org.codehaus.plexus.plexus-component-annotations>
     <version.org.codehaus.plexus.plexus-component-metadata>2.2.0</version.org.codehaus.plexus.plexus-component-metadata>
@@ -840,7 +818,6 @@
           <artifactId>sortpom-maven-plugin</artifactId>
           <version>${version.com.github.ekryd.sortpom}</version>
           <configuration>
-            <encoding>${project.build.sourceEncoding}</encoding>
             <expandEmptyElements>false</expandEmptyElements>
             <lineSeparator>\n</lineSeparator>
             <sortDependencies>scope,groupId,artifactId</sortDependencies>
@@ -897,13 +874,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-assembly-plugin}</version>
           <configuration>
             <archive>
               <index>true</index>
@@ -928,7 +899,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-checkstyle-plugin}</version>
           <configuration>
             <configLocation>checkstyle.xml</configLocation>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -947,13 +917,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-clean-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-compiler-plugin}</version>
           <configuration>
             <proc>full</proc>
             <annotationProcessorPaths>
@@ -967,18 +931,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-dependency-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-deploy-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-enforcer-plugin}</version>
           <dependencies>
             <dependency>
               <groupId>org.ow2.asm</groupId>
@@ -989,23 +942,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-gpg-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-install-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-jar-plugin}</version>
           <configuration>
             <archive>
               <index>true</index>
@@ -1030,7 +967,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-javadoc-plugin}</version>
           <configuration>
             <additionalOptions>
               <additionalOption>-html5</additionalOption>
@@ -1044,18 +980,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jxr-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-jxr-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-plugin-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-pmd-plugin}</version>
           <dependencies>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
@@ -1086,13 +1011,7 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-release-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-resources-plugin}</version>
           <configuration>
             <propertiesEncoding>UTF-8</propertiesEncoding>
           </configuration>
@@ -1103,29 +1022,8 @@
           <version>${version.org.apache.maven.plugins.maven-shade-plugin}</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-site-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-source-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-report-plugin</artifactId>
-          <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
-        </plugin>
-        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>${version.org.codehaus.mojo.buildnumber-maven-plugin}</version>
           <executions>
             <execution>
               <goals>
@@ -1136,11 +1034,6 @@
               </configuration>
             </execution>
           </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>versions-maven-plugin</artifactId>
-          <version>${version.org.codehaus.mojo.versions-maven-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
@@ -1155,7 +1048,6 @@
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
           <configuration>
             <lifecycleMappingMetadata>
               <pluginExecutions>
@@ -1344,6 +1236,7 @@ limitations under the License.]]></inlineHeader>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
         <configuration>
           <properties>
             <configurationParameters>junit.jupiter.execution.parallel.enabled=false
@@ -1375,13 +1268,14 @@ junit.jupiter.execution.parallel.config.dynamic.factor=1</configurationParameter
         <configuration>
           <tagNameFormat>@{project.version}</tagNameFormat>
           <autoVersionSubmodules>true</autoVersionSubmodules>
-          <releaseProfiles>empty-javadoc-jar,gpg-sign</releaseProfiles>
+          <releaseProfiles>empty-javadoc-jar,central-release</releaseProfiles>
           <signTag>false</signTag>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
         <configuration>
           <properties>
             <configurationParameters>junit.jupiter.execution.parallel.enabled=false
