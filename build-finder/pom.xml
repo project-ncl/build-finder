@@ -74,6 +74,12 @@
                   </includes>
                 </filter>
                 <filter>
+                  <artifact>io.smallrye.config:*</artifact>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </filter>
+                <filter>
                   <artifact>org.apache.commons:commons-compress</artifact>
                   <includes>
                     <include>**</include>
@@ -122,13 +128,13 @@
                   </includes>
                 </filter>
                 <filter>
-                  <artifact>org.jboss.resteasy:resteasy-client</artifact>
+                  <artifact>org.jboss.resteasy:*</artifact>
                   <includes>
                     <include>**</include>
                   </includes>
                 </filter>
                 <filter>
-                  <artifact>org.jboss.resteasy:resteasy-jaxrs</artifact>
+                  <artifact>org.jboss.resteasy.microprofile:*</artifact>
                   <includes>
                     <include>**</include>
                   </includes>

@@ -40,11 +40,6 @@
         <ignoreVersion type="regex">([^1]\..+|1\.[^4].*)</ignoreVersion>
       </ignoreVersions>
     </rule>
-    <rule groupId="org.jboss.resteasy" comparisonMethod="maven">
-      <ignoreVersions>
-        <ignoreVersion type="regex">[^3]\..+</ignoreVersion>
-      </ignoreVersions>
-    </rule>
     <rule groupId="org.jetbrains.kotlin" comparisonMethod="maven">
       <ignoreVersions>
         <ignoreVersion type="regex">([^1]\..+|1\.[^6].*)</ignoreVersion>

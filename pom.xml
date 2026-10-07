@@ -63,7 +63,7 @@
   </scm>
 
   <properties>
-    <jakarta />
+    <jakarta>-jakarta</jakarta>
     <!-- Override enforcer requirements -->
     <jdk.min.version>21</jdk.min.version>
     <koji.hub.url />
@@ -97,7 +97,10 @@
     <version.io.dropwizard.metrics>4.2.40</version.io.dropwizard.metrics>
     <version.io.opentelemetry.instrumentation>2.31.1</version.io.opentelemetry.instrumentation>
     <version.io.smallrye.common>2.21.1</version.io.smallrye.common>
+    <version.io.smallrye.config>4.0.0</version.io.smallrye.config>
+    <version.jakarta.activation>2.1.4</version.jakarta.activation>
     <version.jakarta.validation>3.1.1</version.jakarta.validation>
+    <version.jakarta.ws.rs>4.0.0</version.jakarta.ws.rs>
     <version.net.revelc.code.formatter>2.29.0</version.net.revelc.code.formatter>
     <version.net.revelc.code.impsort-maven-plugin>1.13.0</version.net.revelc.code.impsort-maven-plugin>
     <version.net.sourceforge.pmd>7.28.0</version.net.sourceforge.pmd>
@@ -124,6 +127,7 @@
     <version.org.commonjava.util.jhttpc>1.18</version.org.commonjava.util.jhttpc>
     <version.org.commonjava.util.o11yphant-metrics-core>1.9.2</version.org.commonjava.util.o11yphant-metrics-core>
     <version.org.ec4j.maven.editorconfig-maven-plugin>0.2.0</version.org.ec4j.maven.editorconfig-maven-plugin>
+    <version.org.eclipse.microprofile.config>3.1.2</version.org.eclipse.microprofile.config>
     <version.org.eclipse.packager>0.21.0</version.org.eclipse.packager>
     <version.org.fusesource.jansi>2.4.3</version.org.fusesource.jansi>
     <version.org.hibernate.validator>9.1.0.Final</version.org.hibernate.validator>
@@ -133,8 +137,10 @@
     <version.org.jboss.byteman>4.0.27</version.org.jboss.byteman>
     <version.org.jboss.logging>3.6.3.Final</version.org.jboss.logging>
     <version.org.jboss.logmanager>3.2.2.Final</version.org.jboss.logmanager>
-    <version.org.jboss.pnc.pnc>3.4.4</version.org.jboss.pnc.pnc>
+    <version.org.jboss.pnc.pnc>3.5.20</version.org.jboss.pnc.pnc>
     <version.org.jboss.pnc.pnc-api>3.5.2</version.org.jboss.pnc.pnc-api>
+    <version.org.jboss.resteasy>7.0.5.Final</version.org.jboss.resteasy>
+    <version.org.jboss.resteasy.microprofile>3.0.1.Final</version.org.jboss.resteasy.microprofile>
     <version.org.jeasy>5.0.0</version.org.jeasy>
     <version.org.jetbrains.kotlin>1.6.21</version.org.jetbrains.kotlin>
     <version.org.json.json>20200518</version.org.json.json>
@@ -295,10 +301,28 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- XXX: Required dependency for microprofile-rest-client -->
+      <dependency>
+        <groupId>io.smallrye.config</groupId>
+        <artifactId>smallrye-config</artifactId>
+        <version>${version.io.smallrye.config}</version>
+      </dependency>
+      <!-- Required dependency for jackson-module-jakarta-xmlbind-annotations and resteasy-{core,core-spi} -->
+      <dependency>
+        <groupId>jakarta.activation</groupId>
+        <artifactId>jakarta.activation-api</artifactId>
+        <version>${version.jakarta.activation}</version>
+      </dependency>
       <dependency>
         <groupId>jakarta.validation</groupId>
         <artifactId>jakarta.validation-api</artifactId>
         <version>${version.jakarta.validation}</version>
+      </dependency>
+      <!-- Required dependency for microprofile-rest-client and resteasy-client -->
+      <dependency>
+        <groupId>jakarta.ws.rs</groupId>
+        <artifactId>jakarta.ws.rs-api</artifactId>
+        <version>${version.jakarta.ws.rs}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -388,6 +412,12 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Required dependency for microprofile-rest-client and smallrye-config -->
+      <dependency>
+        <groupId>org.eclipse.microprofile.config</groupId>
+        <artifactId>microprofile-config-api</artifactId>
+        <version>${version.org.eclipse.microprofile.config}</version>
+      </dependency>
       <dependency>
         <groupId>org.eclipse.packager</groupId>
         <artifactId>packager-core</artifactId>
@@ -441,6 +471,10 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.jboss.pnc</groupId>
+            <artifactId>pnc-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- Required dependency for resteasy-client -->
@@ -459,6 +493,10 @@
         <artifactId>rest-client${jakarta}</artifactId>
         <version>${version.org.jboss.pnc.pnc}</version>
         <exclusions>
+          <exclusion>
+            <groupId>org.jboss.pnc</groupId>
+            <artifactId>pnc-common</artifactId>
+          </exclusion>
           <exclusion>
             <groupId>org.jboss.pnc.dto</groupId>
             <artifactId>dto</artifactId>
@@ -485,6 +523,18 @@
         <groupId>org.jboss.pnc.build.finder</groupId>
         <artifactId>report</artifactId>
         <version>2.6.8-SNAPSHOT</version>
+      </dependency>
+      <!-- XXX: Required dependency for rest-client -->
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-client</artifactId>
+        <version>${version.org.jboss.resteasy}</version>
+      </dependency>
+      <!-- XXX: Required dependency for rest-client -->
+      <dependency>
+        <groupId>org.jboss.resteasy.microprofile</groupId>
+        <artifactId>microprofile-rest-client</artifactId>
+        <version>${version.org.jboss.resteasy.microprofile}</version>
       </dependency>
       <!-- XXX: Required dependency for kotlin-stdlib-{jdk7,jdk8} (okhttp-4.10.0, 1.5.x and 1.6.x) -->
       <dependency>

@@ -19,6 +19,7 @@ import static com.redhat.red.build.koji.model.json.KojiJsonConstants.BUILD_SYSTE
 import static com.redhat.red.build.koji.model.json.KojiJsonConstants.EXTERNAL_BUILD_ID;
 import static com.redhat.red.build.koji.model.xmlrpc.KojiBtype.maven;
 import static com.redhat.red.build.koji.model.xmlrpc.KojiBtype.npm;
+import static com.redhat.red.build.koji.model.xmlrpc.KojiBtype.rpm;
 import static org.apache.commons.lang3.ArrayUtils.EMPTY_STRING_ARRAY;
 import static org.jboss.pnc.api.constants.Attributes.BREW_TAG_PREFIX;
 import static org.jboss.pnc.api.constants.Attributes.BUILD_BREW_NAME;
@@ -292,6 +293,7 @@ public final class PncUtils {
         return switch (buildType) {
             case GRADLE, MVN, MVN_RPM, SBT -> maven;
             case NPM -> npm;
+            case RPM -> rpm;
         };
     }
 
