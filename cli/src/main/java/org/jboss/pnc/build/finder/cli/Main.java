@@ -425,9 +425,7 @@ public final class Main implements Callable<Void> {
         GlobalConfigurationChildBuilder globalConfig = new GlobalConfigurationBuilder();
         String cacheLocation = ConfigDefaults.CACHE_LOCATION.toString();
 
-        globalConfig.globalState()
-                .persistentLocation(cacheLocation)
-                .serialization()
+        globalConfig.serialization()
                 .addContextInitializer(new ProtobufSerializerImpl())
                 .allowList()
                 .addRegexp(".*")
