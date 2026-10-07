@@ -28,6 +28,7 @@
     <ignoreVersion type="regex">.+[-.][Bb]eta[-.]?\d+</ignoreVersion>
     <ignoreVersion type="regex">.+-M\d+</ignoreVersion>
     <ignoreVersion type="regex">.+-rc-?\d+</ignoreVersion>
+    <ignoreVersion type="regex">.+[-.]redhat-\d+</ignoreVersion>
   </ignoreVersions>
   <rules>
     <rule groupId="org.codehaus.plexus" artifactId="plexus-utils" comparisonMethod="maven">
