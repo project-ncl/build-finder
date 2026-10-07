@@ -246,6 +246,10 @@
         <version>${version.com.redhat.red.build.kojiji}</version>
         <exclusions>
           <exclusion>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+          </exclusion>
+          <exclusion>
             <groupId>org.commonjava.rwx</groupId>
             <artifactId>rwx</artifactId>
           </exclusion>
