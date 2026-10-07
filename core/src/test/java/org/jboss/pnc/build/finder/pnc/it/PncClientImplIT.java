@@ -99,7 +99,7 @@ class PncClientImplIT extends AbstractKojiIT {
             // when
             getPncClient().getBuildPushReport(buildId);
         }).isExactlyInstanceOf(RemoteResourceNotFoundException.class)
-                .hasMessage("javax.ws.rs.NotFoundException: HTTP 404 Not Found");
+                .hasMessage("jakarta.ws.rs.NotFoundException: HTTP 404 Not Found");
     }
 
     @Test
@@ -124,6 +124,6 @@ class PncClientImplIT extends AbstractKojiIT {
             // when
             getPncClient().getProductVersion(buildId);
         }).isExactlyInstanceOf(RemoteResourceNotFoundException.class)
-                .hasMessage("javax.ws.rs.NotFoundException: HTTP 404 Not Found");
+                .hasMessage("jakarta.ws.rs.NotFoundException: HTTP 404 Not Found");
     }
 }
