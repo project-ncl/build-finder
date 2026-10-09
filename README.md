@@ -36,16 +36,9 @@ To run, the integration tests, you need a
 distribution file (`.ear`, `.zip`, etc.) that you want to use for
 testing.
 
-If the build fails due to problems with file formatting:
-
-* To format the `pom.xml` files, run `mvn
-  com.github.ekryd.sortpom:sortpom-maven-plugin:sort`.
-
-* To format the source code, run `mvn
-  net.revelc.code.formatter:formatter-maven-plugin:format`.
-
-* To sort the Java `import` statements, run `mvn
-  net.revelc.code:impsort-maven-plugin:sort`.
+If the build fails due to problems with file formatting, run `mvn
+spotless:apply`. This formats the `pom.xml` files, formats the source code,
+and sorts the Java imports.
 
 ## Operation
 

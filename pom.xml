@@ -23,7 +23,7 @@
     <groupId>org.jboss</groupId>
     <artifactId>jboss-parent</artifactId>
     <version>54</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.jboss.pnc.build.finder</groupId>
@@ -66,19 +66,18 @@
     <jakarta>-jakarta</jakarta>
     <!-- Override enforcer requirements -->
     <jdk.min.version>21</jdk.min.version>
-    <koji.hub.url />
-    <koji.web.url />
+    <koji.hub.url/>
+    <koji.web.url/>
 
     <maven.compiler.release>17</maven.compiler.release>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <mavenVersion>3.6.3</mavenVersion>
-    <pnc.url />
+    <pnc.url/>
     <skipITs>true</skipITs>
     <version.ch.qos.logback>1.6.5</version.ch.qos.logback>
     <version.com.fasterxml.jackson>2.22.3</version.com.fasterxml.jackson>
     <version.com.ginsberg.junit5-system-exit>2.0.3</version.com.ginsberg.junit5-system-exit>
-    <version.com.github.ekryd.sortpom>4.0.0</version.com.github.ekryd.sortpom>
     <version.com.github.luben>1.5.7-22</version.com.github.luben>
     <version.com.github.spotbugs.spotbugs>4.10.4</version.com.github.spotbugs.spotbugs>
     <version.com.github.spotbugs.spotbugs-maven-plugin>4.10.4.1</version.com.github.spotbugs.spotbugs-maven-plugin>
@@ -101,8 +100,6 @@
     <version.jakarta.activation>2.1.4</version.jakarta.activation>
     <version.jakarta.validation>3.1.1</version.jakarta.validation>
     <version.jakarta.ws.rs>4.0.0</version.jakarta.ws.rs>
-    <version.net.revelc.code.formatter>2.29.0</version.net.revelc.code.formatter>
-    <version.net.revelc.code.impsort-maven-plugin>1.13.0</version.net.revelc.code.impsort-maven-plugin>
     <version.net.sourceforge.pmd>7.28.0</version.net.sourceforge.pmd>
     <version.org.apache.commons.commons-collections4>4.6.0</version.org.apache.commons.commons-collections4>
     <version.org.apache.commons.commons-compress>1.28.0</version.org.apache.commons.commons-compress>
@@ -889,20 +886,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.github.ekryd.sortpom</groupId>
-          <artifactId>sortpom-maven-plugin</artifactId>
-          <version>${version.com.github.ekryd.sortpom}</version>
-          <configuration>
-            <expandEmptyElements>false</expandEmptyElements>
-            <lineSeparator>\n</lineSeparator>
-            <sortDependencies>scope,groupId,artifactId</sortDependencies>
-            <sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
-            <sortPlugins>scope,groupId,artifactId</sortPlugins>
-            <sortProperties>true</sortProperties>
-            <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>com.github.spotbugs</groupId>
           <artifactId>spotbugs-maven-plugin</artifactId>
           <version>${version.com.github.spotbugs.spotbugs-maven-plugin}</version>
@@ -926,26 +909,6 @@
           <groupId>com.mycila</groupId>
           <artifactId>license-maven-plugin</artifactId>
           <version>${version.com.mycila}</version>
-        </plugin>
-        <plugin>
-          <groupId>net.revelc.code</groupId>
-          <artifactId>impsort-maven-plugin</artifactId>
-          <version>${version.net.revelc.code.impsort-maven-plugin}</version>
-          <configuration>
-            <groups>java.,javax.,org.,com.</groups>
-            <lineEnding>LF</lineEnding>
-            <removeUnused>true</removeUnused>
-            <staticGroups>*</staticGroups>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>net.revelc.code.formatter</groupId>
-          <artifactId>formatter-maven-plugin</artifactId>
-          <version>${version.net.revelc.code.formatter}</version>
-          <configuration>
-            <configFile>https://raw.githubusercontent.com/project-ncl/ide-config/main/src/main/resources/java-formatter.xml</configFile>
-            <lineEnding>LF</lineEnding>
-          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1155,18 +1118,6 @@
 
     <plugins>
       <plugin>
-        <groupId>com.github.ekryd.sortpom</groupId>
-        <artifactId>sortpom-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>sort</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
         <executions>
@@ -1226,28 +1177,6 @@ limitations under the License.]]></inlineHeader>
         </executions>
       </plugin>
       <plugin>
-        <groupId>net.revelc.code</groupId>
-        <artifactId>impsort-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>sort</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>net.revelc.code.formatter</groupId>
-        <artifactId>formatter-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>format</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
@@ -1282,19 +1211,19 @@ limitations under the License.]]></inlineHeader>
             </goals>
             <configuration>
               <rules>
-                <banDistributionManagement />
-                <banDuplicatePomDependencyVersions />
+                <banDistributionManagement/>
+                <banDuplicatePomDependencyVersions/>
                 <dependencyConvergence>
                   <uniqueVersions>true</uniqueVersions>
                 </dependencyConvergence>
-                <reactorModuleConvergence />
+                <reactorModuleConvergence/>
                 <requireJavaVersion>
                   <version>[${maven.compiler.release},)</version>
                 </requireJavaVersion>
                 <requireMavenVersion>
                   <version>${mavenVersion}</version>
                 </requireMavenVersion>
-                <requirePluginVersions />
+                <requirePluginVersions/>
                 <requireSameVersions>
                   <plugins>
                     <plugin>org.apache.maven.plugins:maven-failsafe-plugin</plugin>
@@ -1302,7 +1231,7 @@ limitations under the License.]]></inlineHeader>
                     <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
                   </plugins>
                 </requireSameVersions>
-                <requireUpperBoundDeps />
+                <requireUpperBoundDeps/>
               </rules>
             </configuration>
           </execution>
@@ -1426,6 +1355,44 @@ junit.jupiter.execution.parallel.config.dynamic.factor=1</configurationParameter
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>3.10.3</version>
+        <configuration>
+          <pom>
+            <lineEndings>UNIX</lineEndings>
+            <sortPom>
+              <expandEmptyElements>false</expandEmptyElements>
+            </sortPom>
+          </pom>
+          <java>
+            <removeUnusedImports/>
+            <importOrder>
+              <file>java-import-order.txt</file>
+            </importOrder>
+            <eclipse>
+              <file>java-formatter.xml</file>
+            </eclipse>
+            <lineEndings>UNIX</lineEndings>
+          </java>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.pnc</groupId>
+            <artifactId>ide-config</artifactId>
+            <version>1.1.0</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>apply</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -1498,8 +1465,6 @@ junit.jupiter.execution.parallel.config.dynamic.factor=1</configurationParameter
         <checkstyle.skip>true</checkstyle.skip>
         <editorconfig.skip>true</editorconfig.skip>
         <enforcer.skip>true</enforcer.skip>
-        <formatter.skip>true</formatter.skip>
-        <impsort.skip>true</impsort.skip>
         <jacoco.skip>true</jacoco.skip>
         <license.skip>true</license.skip>
         <maven.buildNumber.skip>true</maven.buildNumber.skip>
