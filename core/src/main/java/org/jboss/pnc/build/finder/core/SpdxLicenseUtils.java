@@ -41,6 +41,8 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spdx.core.DefaultStoreNotInitializedException;
 import org.spdx.core.InvalidSPDXAnalysisException;
 import org.spdx.library.LicenseInfoFactory;
@@ -53,6 +55,8 @@ import org.spdx.utility.compare.SpdxCompareException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 public final class SpdxLicenseUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpdxLicenseUtils.class);
+
     static final String NOASSERTION = NOASSERTION_LICENSE_NAME;
 
     static final String NONE = NONE_LICENSE_NAME;
@@ -485,6 +489,13 @@ public final class SpdxLicenseUtils {
             }
         } catch (SpdxCompareException | InvalidSPDXAnalysisException e) {
             // ignore
+        } catch (RuntimeException e) {
+            LOGGER.warn(
+                    "Error comparing ID '{}' to text '{}': {}",
+                    listedLicense.getId(),
+                    licenseText,
+                    e.getMessage());
+            LOGGER.debug("Error", e);
         }
 
         return Optional.empty();
@@ -594,7 +605,7 @@ public final class SpdxLicenseUtils {
         return NOASSERTION.equals(licenseId) || NONE.equals(licenseId);
     }
 
-    static AnyLicenseInfo parseSPDXLicenseString(String licenseString)
+    static synchronized AnyLicenseInfo parseSPDXLicenseString(String licenseString)
             throws InvalidLicenseStringException, DefaultStoreNotInitializedException {
         return LicenseInfoFactory.parseSPDXLicenseString(licenseString);
     }
