@@ -18,7 +18,6 @@ package org.jboss.pnc.build.finder.core;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static java.util.jar.Attributes.Name.MANIFEST_VERSION;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.io.IOException;
@@ -110,14 +109,6 @@ class LicenseUtilsTest {
         assertThat(bundleLicenses).hasSize(1)
                 .flatMap(BundleLicense::getLicenseIdentifier)
                 .containsExactly("LICENSE.txt");
-    }
-
-    @Test
-    void testGetBundleLicenseFromManifestThrowsException() {
-        String s = "Apache License, Version 2.0; see: http://www.apache.org/\n" + " licenses/LICENSE-2.0.txt";
-        assertThatCode(() -> LicenseUtils.getBundleLicenseFromManifest(s)).isInstanceOf(IOException.class)
-                .hasMessage(
-                        "Expected key=value pair, but got see: http://www.apache.org/\n" + " licenses/LICENSE-2.0.txt");
     }
 
     @Test

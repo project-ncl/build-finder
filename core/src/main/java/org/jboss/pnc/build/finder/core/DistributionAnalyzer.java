@@ -51,6 +51,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -81,6 +82,7 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Strings;
+import org.apache.commons.vfs2.CacheStrategy;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileExtensionSelector;
 import org.apache.commons.vfs2.FileObject;
@@ -117,8 +119,6 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
             "-sources.jar" + BANG_SLASH,
             "-javadoc.jar" + BANG_SLASH,
             "-tests.jar" + BANG_SLASH };
-
-    private static final String JAR_URI = ".jar" + BANG_SLASH;
 
     private static final String CHECKSUMS_FILENAME_BASENAME = "checksums-";
 
@@ -399,6 +399,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
     private static FileSystemManager createManager() throws FileSystemException {
         StandardFileSystemManager sfs = new StandardFileSystemManager();
 
+        sfs.setCacheStrategy(CacheStrategy.MANUAL);
         sfs.init();
 
         if (!sfs.hasProvider("http")) {
@@ -493,6 +494,15 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
             String message = getMessage(e);
             fileErrors.add(new FileError(filename, message));
             LOGGER.warn("Unable to process archive/compressed file: {}: {}", red(filename), red(message));
+            LOGGER.debug("Error", e);
+        } catch (RuntimeException e) {
+            String filename = normalizePath(fo, root);
+            String message = getMessage(e);
+            fileErrors.add(new FileError(filename, getMessage(e)));
+            LOGGER.error(
+                    "Unable to process archive/compressed file due to unexpected error: {}: {}",
+                    boldRed(filename),
+                    boldRed(message));
             LOGGER.debug("Error", e);
         } finally {
             if (fs != null) {
@@ -592,7 +602,9 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
             List<Callable<Set<Checksum>>> checksumTasks = new ArrayList<>(pomFiles.size());
             List<Future<?>> archiveFutures = new ArrayList<>();
 
-            if (isMainJar(fo)) {
+            boolean mainArchive = isMainArchive(fo);
+
+            if (mainArchive) {
                 List<LicenseInfo> licenseInfos = addLicensesFromJar(fo, pomFiles);
                 putLicenses(Utils.normalizePath(fo, root), licenseInfos);
             }
@@ -625,12 +637,11 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                     boolean pom = isPom(file);
                     boolean pomXml = isPomXml(file);
 
-                    if (pom || pomXml) {
-                        List<LicenseInfo> licenseInfos = addLicensesFromPom(file);
-
+                    if (pom || (pomXml && !mainArchive)) {
                         try {
                             Map<String, List<LicenseInfo>> map = getLicenses(root, file);
-                            putLicenses(map.keySet().iterator().next(), licenseInfos);
+                            Entry<String, List<LicenseInfo>> entry = map.entrySet().iterator().next();
+                            putLicenses(entry.getKey(), entry.getValue());
                         } catch (XmlPullParserException | InterpolationException e) {
                             if (LOGGER.isErrorEnabled()) {
                                 LOGGER.error(
@@ -688,13 +699,14 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
         }
     }
 
-    private static boolean isMainJar(FileObject fo) {
-        String name = fo.getPublicURIString();
-        return name.endsWith(JAR_URI) && !Strings.CS.endsWithAny(name, JARS_TO_IGNORE);
+    private static boolean isMainArchive(FileObject fo) throws FileSystemException {
+        FileObject archive = fo.getFileSystem().getParentLayer();
+        return archive != null && isJavaArchive(archive)
+                && !Strings.CS.endsWithAny(fo.getPublicURIString(), JARS_TO_IGNORE);
     }
 
     private List<LicenseInfo> addLicensesFromJar(FileObject jar, List<FileObject> localFiles) {
-        return localFiles.parallelStream()
+        return localFiles.stream()
                 .map(localFile -> addLicensesFromJar(jar, localFile))
                 .filter(not(Collection::isEmpty))
                 .flatMap(Collection::stream)
@@ -707,6 +719,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
         try {
             if (isPomXml(localFile)) {
                 licenseInfos = addLicensesFromPom(localFile);
+                putLicenses(normalizePath(localFile, root), licenseInfos);
             } else if (isManifestMfFileName(localFile)) {
                 licenseInfos = addLicensesFromBundleLicense(localFile);
             } else if (isLicenseFile(localFile)) {
@@ -816,32 +829,23 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
     }
 
     private void handleRelativeURL(FileObject jar, FileObject localFile, LicenseInfo licenseInfo) {
-        String name = licenseInfo.getName();
-        String url = licenseInfo.getUrl();
-
-        if (name == null && url == null) {
-            return;
+        for (String name : Arrays.asList(licenseInfo.getName(), licenseInfo.getUrl())) {
+            if (name != null && !isUrl(name) && handleRelativeURL(jar, localFile, licenseInfo, name)) {
+                return;
+            }
         }
+    }
 
-        // URL is not relative, ignore
-        if (isUrl(url)) {
-            return;
-        }
-
-        if (name == null) {
-            name = url;
-        }
-
+    private boolean handleRelativeURL(FileObject jar, FileObject localFile, LicenseInfo licenseInfo, String name) {
         try {
-            // If the URL is absent, consider the possibility that the name refers to a file inside the JAR
             FileObject licenseFile = jar.resolveFile(name);
 
             if (!isLicenseFile(licenseFile)) {
-                return;
+                return false;
             }
 
             if (licenseFile.isFolder()) {
-                return;
+                return false;
             }
 
             if (!licenseFile.isReadable()) {
@@ -852,7 +856,7 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                             red(normalizePath(localFile, root)));
                 }
 
-                return;
+                return false;
             }
 
             List<LicenseInfo> licenseInfos = addLicenseFromTextFile(jar, licenseFile);
@@ -865,13 +869,14 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                             red(normalizePath(jar, root)));
                 }
 
-                return;
+                return false;
             }
 
             // XXX: Currently, the API returns either 0 or 1 licenses, which we rely on here
             LicenseInfo licenseInfo2 = licenseInfos.get(0);
             String spdxLicenseId = licenseInfo2.getSpdxLicenseId();
             licenseInfo.setSpdxLicense(spdxLicenseId);
+            return !NOASSERTION.equals(spdxLicenseId);
         } catch (IOException e) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error(
@@ -880,6 +885,8 @@ public class DistributionAnalyzer implements Callable<Map<ChecksumType, MultiVal
                         boldRed(normalizePath(jar, root)),
                         boldRed(getAllErrorMessages(e)));
             }
+
+            return false;
         }
     }
 

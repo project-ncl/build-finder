@@ -15,7 +15,6 @@
  */
 package org.jboss.pnc.build.finder.core;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +96,7 @@ public class BundleLicense {
                 + ", description: '" + description + '\'';
     }
 
-    public static List<BundleLicense> parse(String s) throws IOException {
+    public static List<BundleLicense> parse(String s) {
         if (StringUtils.isEmpty(s) || EXTERNAL.equals(s)) {
             return List.of();
         }
@@ -113,7 +112,7 @@ public class BundleLicense {
         return Collections.unmodifiableList(list);
     }
 
-    private static BundleLicense newBundleLicense(String value) throws IOException {
+    private static BundleLicense newBundleLicense(String value) {
         BundleLicense bundleLicense = new BundleLicense();
         String[] licenseTokens = LICENSE_PATTERN.split(value, 2);
         String licenseIdentifier = removeQuotes(licenseTokens[0]);
@@ -131,22 +130,21 @@ public class BundleLicense {
                 String[] kv = LICENSE_ATTRIBUTE_PATTERN.split(attribute, 2);
 
                 if (kv.length != 2) {
-                    throw new IOException("Expected key=value pair, but got " + attribute);
+                    continue;
                 }
 
                 String k = removeQuotes(kv[0]);
                 String v = removeQuotes(kv[1]);
 
-                switch (k) {
-                    case LINK -> {
-                        if (!LicenseUtils.isUrl(v)) {
-                            throw new IOException("Expected URL, but got " + v);
-                        }
+                if (v.isBlank()) {
+                    continue;
+                }
 
-                        bundleLicense.setLink(v);
-                    }
+                switch (k) {
+                    case LINK -> bundleLicense.setLink(v);
                     case DESCRIPTION -> bundleLicense.setDescription(v);
-                    default -> throw new IOException("Unknown key " + k);
+                    default -> {
+                    }
                 }
             }
         }

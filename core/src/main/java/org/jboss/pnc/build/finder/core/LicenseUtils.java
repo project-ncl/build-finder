@@ -79,7 +79,14 @@ public final class LicenseUtils {
     }
 
     static String normalizeLicenseUrl(String licenseUrl) {
-        URI uri = URI.create(licenseUrl).normalize();
+        URI uri;
+
+        try {
+            uri = URI.create(licenseUrl).normalize();
+        } catch (IllegalArgumentException e) {
+            return licenseUrl;
+        }
+
         String host = Objects.requireNonNullElse(uri.getHost(), "");
         host = host.replace("www.", "");
         // XXX: Helps match license id
@@ -194,7 +201,7 @@ public final class LicenseUtils {
         return text.lines().limit(LINE_LIMIT).map(String::trim).collect(Collectors.joining(SPACE));
     }
 
-    static List<BundleLicense> getBundleLicenseFromManifest(String bundleLicense) throws IOException {
+    static List<BundleLicense> getBundleLicenseFromManifest(String bundleLicense) {
         return BundleLicense.parse(bundleLicense);
     }
 
