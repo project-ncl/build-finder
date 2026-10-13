@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.core.Response;
+
 import org.jboss.pnc.build.finder.koji.KojiBuild;
 import org.jboss.pnc.build.finder.koji.KojiClientSession;
 import org.jboss.pnc.build.finder.koji.KojiLocalArchive;
@@ -47,9 +50,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import jakarta.ws.rs.ClientErrorException;
-import jakarta.ws.rs.core.Response;
 
 /**
  * Tests of PncBuildFinder
