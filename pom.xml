@@ -80,7 +80,7 @@
     <version.com.ginsberg.junit5-system-exit>2.0.3</version.com.ginsberg.junit5-system-exit>
     <version.com.github.luben>1.5.7-22</version.com.github.luben>
     <version.com.github.spotbugs.spotbugs>4.10.4</version.com.github.spotbugs.spotbugs>
-    <version.com.github.spotbugs.spotbugs-maven-plugin>4.10.4.1</version.com.github.spotbugs.spotbugs-maven-plugin>
+    <version.com.github.spotbugs.spotbugs-maven-plugin>4.10.5.0</version.com.github.spotbugs.spotbugs-maven-plugin>
     <version.com.google.code.gson>2.14.0</version.com.google.code.gson>
     <version.com.google.errorprone>2.50.0</version.com.google.errorprone>
     <version.com.google.guava.failureaccess>1.0.3</version.com.google.guava.failureaccess>
