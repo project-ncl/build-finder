@@ -112,7 +112,7 @@
     <version.org.apache.maven>3.10.0</version.org.apache.maven>
     <version.org.apache.maven.plugins.maven-project-info-reports-plugin>3.9.0</version.org.apache.maven.plugins.maven-project-info-reports-plugin>
     <version.org.apache.maven.plugins.maven-shade-plugin>3.6.2</version.org.apache.maven.plugins.maven-shade-plugin>
-    <version.org.apache.maven.plugins.maven-surefire-plugin>3.6.0</version.org.apache.maven.plugins.maven-surefire-plugin>
+    <version.org.apache.maven.plugins.maven-surefire-plugin>3.6.1</version.org.apache.maven.plugins.maven-surefire-plugin>
     <version.org.assertj>3.27.7</version.org.assertj>
     <version.org.bouncycastle>1.86</version.org.bouncycastle>
     <version.org.codehaus.plexus.plexus-classworlds>2.12.1</version.org.codehaus.plexus.plexus-classworlds>
