@@ -94,7 +94,7 @@
     <version.commons-validator>1.11.0</version.commons-validator>
     <version.info.picocli>4.7.7</version.info.picocli>
     <version.io.dropwizard.metrics>4.2.40</version.io.dropwizard.metrics>
-    <version.io.opentelemetry.instrumentation>2.32.0</version.io.opentelemetry.instrumentation>
+    <version.io.opentelemetry.instrumentation>2.33.1</version.io.opentelemetry.instrumentation>
     <version.io.smallrye.common>2.21.1</version.io.smallrye.common>
     <version.io.smallrye.config>4.0.0</version.io.smallrye.config>
     <version.jakarta.activation>2.1.4</version.jakarta.activation>
