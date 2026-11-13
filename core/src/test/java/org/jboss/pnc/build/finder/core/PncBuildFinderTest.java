@@ -18,7 +18,6 @@ package org.jboss.pnc.build.finder.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jboss.pnc.api.constants.Attributes.BUILD_BREW_NAME;
 import static org.jboss.pnc.api.constants.Attributes.BUILD_BREW_VERSION;
-import static org.jboss.pnc.enums.BuildType.MVN;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -45,6 +44,7 @@ import org.jboss.pnc.dto.BuildConfigurationRevisionRef;
 import org.jboss.pnc.dto.ProjectRef;
 import org.jboss.pnc.dto.SCMRepository;
 import org.jboss.pnc.dto.User;
+import org.jboss.pnc.enums.BuildType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -57,6 +57,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author Jakub Bartecek
  */
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("deprecation")
 class PncBuildFinderTest {
     @Mock
     private BuildConfig buildConfig;
@@ -102,7 +103,8 @@ class PncBuildFinderTest {
                 .scmRepository(SCMRepository.builder().internalUrl("http://repo.test/empty.git").build())
                 .scmRevision("master")
                 .project(ProjectRef.refBuilder().id("100").build())
-                .buildConfigRevision(BuildConfigurationRevisionRef.refBuilder().id("100").buildType(MVN).build())
+                .buildConfigRevision(
+                        BuildConfigurationRevisionRef.refBuilder().id("100").buildType(BuildType.MVN).build())
                 .build();
 
         Artifact artifact = Artifact.builder()

@@ -70,11 +70,17 @@ public final class PncUtils {
 
     public static final String EXTERNAL_BUILD_TYPE = "external_build_type";
 
+    public static final String ANT = "ant";
+
     public static final String GRADLE = "gradle";
 
     public static final String MAVEN = "maven";
 
+    public static final String MAVEN_RPM = "maven_rpm";
+
     public static final String NPM = "npm";
+
+    public static final String RPM = "rpm";
 
     public static final String SBT = "sbt";
 
@@ -120,6 +126,7 @@ public final class PncUtils {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static String getBrewNameFromArtifacts(PncBuild build) {
         String[] identSplit = getIdentifierPartsFromArtifact(build);
 
@@ -146,6 +153,7 @@ public final class PncUtils {
         return identSplit[0];
     }
 
+    @SuppressWarnings("deprecation")
     private static String getBrewVersionFromArtifacts(PncBuild build) {
         String[] identSplit = getIdentifierPartsFromArtifact(build);
 
@@ -277,26 +285,32 @@ public final class PncUtils {
         return kojiBuild;
     }
 
+    @SuppressWarnings("deprecation")
     private static void addPncBuildTypeToExtra(BuildType buildType, Map<String, Object> extra) {
         switch (buildType) {
-            case NPM -> extra.put(EXTERNAL_BUILD_TYPE, NPM);
+            case ANT -> extra.put(EXTERNAL_BUILD_TYPE, ANT);
             case GRADLE -> extra.put(EXTERNAL_BUILD_TYPE, GRADLE);
-            case SBT -> extra.put(EXTERNAL_BUILD_TYPE, SBT);
             case MVN -> extra.put(EXTERNAL_BUILD_TYPE, MAVEN);
+            case MVN_RPM -> extra.put(EXTERNAL_BUILD_TYPE, MAVEN_RPM);
+            case NPM -> extra.put(EXTERNAL_BUILD_TYPE, NPM);
+            case RPM -> extra.put(EXTERNAL_BUILD_TYPE, RPM);
+            case SBT -> extra.put(EXTERNAL_BUILD_TYPE, SBT);
             default -> extra.put(EXTERNAL_BUILD_TYPE, UNKNOWN);
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static KojiBtype getBuildType(PncBuild pncBuild) {
         BuildType buildType = pncBuild.getBuild().getBuildConfigRevision().getBuildType();
 
         return switch (buildType) {
-            case GRADLE, MVN, MVN_RPM, SBT -> maven;
+            case ANT, GRADLE, MVN, MVN_RPM, SBT -> maven;
             case NPM -> npm;
             case RPM -> rpm;
         };
     }
 
+    @SuppressWarnings("deprecation")
     public static KojiArchiveInfo artifactToKojiArchiveInfo(PncBuild pncBuild, ArtifactRef artifact) {
         Build build = pncBuild.getBuild();
         KojiArchiveInfo archiveInfo = new KojiArchiveInfo();
