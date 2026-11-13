@@ -84,7 +84,7 @@
     <version.com.google.code.gson>2.14.0</version.com.google.code.gson>
     <version.com.google.errorprone>2.52.0</version.com.google.errorprone>
     <version.com.google.guava.failureaccess>1.0.3</version.com.google.guava.failureaccess>
-    <version.com.google.guava.guava>33.7.2-jre</version.com.google.guava.guava>
+    <version.com.google.guava.guava>33.8.0-jre</version.com.google.guava.guava>
     <version.com.j2html>1.6.0</version.com.j2html>
     <version.com.mycila>5.1.2</version.com.mycila>
     <version.com.puppycrawl.tools>14.3.0</version.com.puppycrawl.tools>
