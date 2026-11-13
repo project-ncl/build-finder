@@ -261,6 +261,7 @@ public class PncBuildFinder {
         };
     }
 
+    @SuppressWarnings("deprecation")
     private static int getArtifactQuality(Object obj) {
         Artifact a = (Artifact) obj;
         ArtifactQuality quality = a.getArtifactQuality();
